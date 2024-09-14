@@ -11,8 +11,8 @@ export const accountTypeEnum = ["email", "google", "github"] as const;
 const pgTable = pgTableCreator((name) => `app_${name}`);
 
 export const users = pgTable("user", {
-  id: integer("id").primaryKey(),
-  email: text("email").unique(),
+  id: serial("id").primaryKey(), // Use serial for auto-generation
+  email: text("email").unique().notNull(), // Add NOT NULL constraint
   emailVerified: timestamp("email_verified"),
 });
 

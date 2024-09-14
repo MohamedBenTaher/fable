@@ -1,0 +1,13 @@
+{
+  "version": "1",
+  "dialect": "postgres",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1726316149406,
+      "tag": "0000_light_sasquatch",
+      "breakpoints": true
+    }
+  ]
+}

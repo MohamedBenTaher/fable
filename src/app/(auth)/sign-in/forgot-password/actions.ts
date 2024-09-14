@@ -1,12 +1,11 @@
 "use server";
 
-import { rateLimitByKey } from "@/lib/limiters";
+import { resetPasswordUseCase } from "@/use-cases/users";
 import { unauthenticatedAction } from "@/lib/safe-action";
-import { sendMagicLinkUseCase } from "@/use-cases/magic-link";
-import { redirect } from "next/navigation";
 import { z } from "zod";
+import { rateLimitByKey } from "@/lib/limiters";
 
-export const signInMagicLinkAction = unauthenticatedAction
+export const resetPasswordAction = unauthenticatedAction
   .createServerAction()
   .input(
     z.object({
@@ -15,6 +14,5 @@ export const signInMagicLinkAction = unauthenticatedAction
   )
   .handler(async ({ input }) => {
     await rateLimitByKey({ key: input.email, limit: 1, window: 30000 });
-    await sendMagicLinkUseCase(input.email);
-    redirect("/sign-in/magic");
+    await resetPasswordUseCase(input.email);
   });

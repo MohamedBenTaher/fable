@@ -1,8 +1,18 @@
 import "dotenv/config";
-import { migrate } from "drizzle-orm/libsql/migrator";
-import { client, db } from ".";
+import { db, pool } from "./index"; // Ensure correct import path
+import { migrate } from "drizzle-orm/node-postgres/migrator"; // Ensure correct import path
 
 (async () => {
-  await migrate(db, { migrationsFolder: "./migrations" });
-  client.close();
+  try {
+    await migrate(db, { migrationsFolder: "./migrations" });
+    console.log("Migrations applied successfully");
+  } catch (error) {
+    console.error("Error applying migrations:", error);
+  } finally {
+    if (pool) {
+      pool.end(); // Use pool.end() to close the PostgreSQL connection
+    } else {
+      console.error("Pool is undefined");
+    }
+  }
 })();
