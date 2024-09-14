@@ -10,7 +10,7 @@ import {
   getUserByEmail,
   setEmailVerified,
 } from "@/data-access/users";
-import { MagicLinkEmail } from "@/emails/magic-link";
+import { MagicLinkEmail } from "@/emails/magic-links";
 import { sendEmail } from "@/lib/email";
 import { generateRandomName } from "@/lib/names";
 import { NotFoundError, TokenExpiredError } from "./errors";

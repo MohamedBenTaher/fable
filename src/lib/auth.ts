@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import { User } from "lucia";
 import { Session } from "lucia";
 import { env } from "@/env";
-import { UserId as CustomUserId } from "@/types";
+import { UserId as CustomUserId } from "@/use-cases/types";
 
 const adapter = new DrizzleSQLiteAdapter(db, sessions, users);
 
