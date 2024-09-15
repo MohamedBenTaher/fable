@@ -11,8 +11,9 @@ export const accountTypeEnum = ["email", "google", "github"] as const;
 const pgTable = pgTableCreator((name) => `app_${name}`);
 
 export const users = pgTable("user", {
-  id: serial("id").primaryKey(), // Use serial for auto-generation
-  email: text("email").unique().notNull(), // Add NOT NULL constraint
+  id: serial("id").primaryKey(),
+  role: text("role").$default(() => "user"),
+  email: text("email").unique().notNull(),
   emailVerified: timestamp("email_verified"),
 });
 
@@ -63,6 +64,7 @@ export const profiles = pgTable("profile", {
     .unique()
     .notNull(),
   displayName: text("display_name"),
+  country: text("country"),
   imageId: text("image_id"),
   image: text("image"),
   bio: text("bio").notNull().default(""),

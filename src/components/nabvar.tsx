@@ -19,6 +19,17 @@ function Navbar() {
               Pricing
             </Link>
           </div>
+          <div className="flex items-center space-x-4">
+            <Link
+              className={buttonVariants({ size: "sm", variant: "ghost" })}
+              href="/sign-in"
+            >
+              Sign in
+            </Link>
+            <Link className={buttonVariants({ size: "sm" })} href="/sign-up">
+              Sign up
+            </Link>
+          </div>
         </div>
       </MaxWidthWrapper>
     </div>
