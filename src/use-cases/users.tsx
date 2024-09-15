@@ -80,6 +80,7 @@ export async function registerUserUseCase(email: string, password: string) {
 }
 
 export async function signInUseCase(email: string, password: string) {
+  console.log("signInUseCase");
   const user = await getUserByEmail(email);
 
   if (!user) {

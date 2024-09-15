@@ -1,6 +1,6 @@
 import { GitHub, Google } from "arctic";
 import { Lucia } from "lucia";
-import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle";
+import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
 import { db } from "@/db";
 import { sessions, users } from "@/db/schema";
 import { cookies } from "next/headers";
@@ -9,7 +9,7 @@ import { Session } from "lucia";
 import { env } from "@/env";
 import { UserId as CustomUserId } from "@/use-cases/types";
 
-const adapter = new DrizzleSQLiteAdapter(db, sessions, users);
+const adapter = new DrizzlePostgreSQLAdapter(db, sessions, users);
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
