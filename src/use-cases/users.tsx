@@ -61,15 +61,19 @@ export async function getUserProfileUseCase(userId: UserId) {
 
 export async function registerUserUseCase(email: string, password: string) {
   const existingUser = await getUserByEmail(email);
+
   if (existingUser) {
     throw new EmailInUseError();
   }
 
   const user = await createUser(email);
+
   await createAccount(user.id, password);
+
   await createProfile(user.id, generateRandomName());
 
   const token = await createVerifyEmailToken(user.id);
+
   await sendEmail(
     email,
     `Verify your email for ${applicationName}`,
@@ -80,7 +84,6 @@ export async function registerUserUseCase(email: string, password: string) {
 }
 
 export async function signInUseCase(email: string, password: string) {
-  console.log("signInUseCase");
   const user = await getUserByEmail(email);
 
   if (!user) {

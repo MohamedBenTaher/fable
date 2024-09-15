@@ -1,9 +1,9 @@
-import { Client } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
-import * as schema from "./schema";
-import { env } from "@/env";
+import { Pool } from "pg";
+import * as schema from "./schema"; // Import your schema
 
-export const client = new Client({
-  connectionString: env.DATABASE_URL,
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
 });
-export const db = drizzle(client, { schema });
+
+export const db = drizzle(pool, { schema });

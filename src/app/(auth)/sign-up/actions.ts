@@ -19,6 +19,6 @@ export const signUpAction = unauthenticatedAction
   .handler(async ({ input }) => {
     await rateLimitByIp({ key: "register", limit: 3, window: 30000 });
     const user = await registerUserUseCase(input.email, input.password);
-    await setSession(user.id);
+    await setSession(user);
     return redirect(afterLoginUrl);
   });

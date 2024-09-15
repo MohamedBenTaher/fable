@@ -37,12 +37,16 @@ async function hashPassword(plainTextPassword: string, salt: string) {
 }
 
 export async function createUser(email: string) {
+  console.log("createUser: Start");
+
   const [user] = await db
     .insert(users)
     .values({
-      email,
+      email: email, // Ensure the email field is correctly assigned
     })
     .returning();
+
+  console.log("createUser: End", user);
   return user;
 }
 
@@ -91,11 +95,19 @@ export async function verifyPassword(email: string, plainTextPassword: string) {
 }
 
 export async function getUserByEmail(email: string) {
-  const user = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  });
+  console.log("getUserByEmail: Start");
 
-  return user;
+  try {
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+
+    console.log("getUserByEmail: End", user);
+    return user;
+  } catch (error) {
+    console.error("getUserByEmail: Error", error);
+    throw error;
+  }
 }
 
 export async function getMagicUserAccountByEmail(email: string) {
