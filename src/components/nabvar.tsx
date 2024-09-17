@@ -2,6 +2,7 @@ import React from "react";
 import MaxWidthWrapper from "./max-width-wrapper";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
+import { ArrowRight } from "lucide-react";
 
 function Navbar() {
   return (
@@ -18,8 +19,6 @@ function Navbar() {
             >
               Pricing
             </Link>
-          </div>
-          <div className="flex items-center space-x-4">
             <Link
               className={buttonVariants({ size: "sm", variant: "ghost" })}
               href="/sign-in"
@@ -27,7 +26,8 @@ function Navbar() {
               Sign in
             </Link>
             <Link className={buttonVariants({ size: "sm" })} href="/sign-up">
-              Sign up
+              Get started
+              <ArrowRight className="ml-1.5 h-5 w-5" />
             </Link>
           </div>
         </div>
