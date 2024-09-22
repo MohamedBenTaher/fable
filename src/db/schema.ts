@@ -7,6 +7,23 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const accountTypeEnum = ["email", "google", "github"] as const;
+export enum UploadStatus {
+  Pending = "pending",
+  Processing = "processing",
+  Complete = "complete",
+  Failed = "failed",
+}
+
+function enumToArray(enumObj: any): string[] {
+  return Object.values(enumObj).filter((value) => typeof value === "string");
+}
+function enumToTuple(enumObj: any): [string, ...string[]] {
+  const array = enumToArray(enumObj);
+  if (array.length === 0) {
+    throw new Error("Enum must have at least one value");
+  }
+  return array as [string, ...string[]];
+}
 
 const pgTable = pgTableCreator((name) => `app_${name}`);
 
@@ -80,5 +97,28 @@ export const sessions = pgTable("session", {
   expiresAt: timestamp("expires_at").notNull(),
 });
 
+export const files = pgTable("files", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .references(() => users.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  status: text("status", { enum: enumToTuple(UploadStatus) }).notNull(),
+  key: text("key").notNull(),
+  url: text("url").notNull(),
+  fileName: text("file_name").notNull(),
+  mimeType: text("mime_type").notNull(),
+  size: integer("size").notNull(),
+  uploadedAt: timestamp("uploaded_at").notNull(),
+});
+4;
 export type User = typeof users.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
+export type Account = typeof accounts.$inferSelect;
+export type MagicLink = typeof magicLinks.$inferSelect;
+export type ResetToken = typeof resetTokens.$inferSelect;
+export type VerifyEmailToken = typeof verifyEmailTokens.$inferSelect;
+export type Session = typeof sessions.$inferSelect;
+export type File = typeof files.$inferSelect;
+export type UploadStatusType = UploadStatus;
