@@ -112,7 +112,7 @@ export const files = pgTable("files", {
   size: integer("size").notNull(),
   uploadedAt: timestamp("uploaded_at").notNull(),
 });
-4;
+
 export type User = typeof users.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type Account = typeof accounts.$inferSelect;

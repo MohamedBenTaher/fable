@@ -1,8 +1,7 @@
 import { db } from "@/db";
-import { files, File, UploadStatus } from "@/db/schema";
+import { files, UploadStatus, users } from "@/db/schema";
 import { UserId } from "@/use-cases/types";
-import { eq } from "drizzle-orm";
-import { Upload } from "lucide-react";
+import { eq, and } from "drizzle-orm";
 
 export async function createFile(
   userId: UserId,
@@ -26,4 +25,30 @@ export async function createFile(
     })
     .returning();
   return file;
+}
+
+export async function getFile(fileId: number, userId: number) {
+  const file = await db
+    .select()
+    .from(files)
+    .where(and(eq(files.id, fileId), eq(files.userId, userId)));
+
+  if (!file) {
+    throw new Error("File not found");
+  }
+
+  return file;
+}
+
+export async function getFiles(userId: UserId) {
+  const userFiles = await db.query.files.findMany({
+    where: eq(files.userId, userId),
+  });
+
+  return userFiles;
+}
+
+export async function deleteFile(id: number) {
+  console.log("id in delete", id);
+  await db.delete(files).where(eq(files.id, id));
 }

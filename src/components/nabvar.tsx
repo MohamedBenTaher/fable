@@ -15,7 +15,7 @@ function Navbar() {
           <div className="hidden items-center space-x-4 sm:flex">
             <Link
               className={buttonVariants({ size: "sm", variant: "ghost" })}
-              href="/dashboard"
+              href="/dashboard/"
             >
               Pricing
             </Link>
