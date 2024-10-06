@@ -4,11 +4,10 @@ import Dashbaord from "@/components/dashboard";
 
 async function page() {
   const user = await getCurrentUser();
-  console.log("user", user);
+
   return (
     <div>
       <Dashbaord />
-      
     </div>
   );
 }

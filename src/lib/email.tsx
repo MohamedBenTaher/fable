@@ -10,8 +10,6 @@ export async function sendEmail(
   subject: string,
   body: ReactNode
 ) {
-  console.log("sendEmail: Start");
-
   const { error } = await resend.emails.send({
     from: env.EMAIL_FROM,
     to: email,
@@ -22,5 +20,4 @@ export async function sendEmail(
   if (error) {
     throw error;
   }
-  console.log("sendEmail: End");
 }

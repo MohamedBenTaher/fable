@@ -1,20 +1,53 @@
 "use client";
 
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader } from "./ui/dialog";
-import {
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@radix-ui/react-dialog";
+import { Dialog, DialogContent } from "./ui/dialog";
+import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Button } from "./ui/button";
 import DropZone from "react-dropzone";
 import { Cloud, File } from "lucide-react";
 import { Progress } from "./ui/progress";
+import { useUploadThing } from "@/lib/uploadthing";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
-const UploadDropZone = () => {
+const UploadDropZone = ({ user }: { user: any }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const { startUpload } = useUploadThing("pdfUploader");
+  const { toast } = useToast();
+  const router = useRouter();
+
+  const fetchUploadedFile = async (fileId: number, userId: number) => {
+    try {
+      const params = new URLSearchParams({
+        fileId: fileId.toString(),
+        userId: userId.toString(),
+      });
+
+      const response = await fetch(`/api/files?${params.toString()}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch file");
+      }
+
+      await response.json();
+
+      toast({
+        title: "File uploaded successfully",
+        description: "Your file has been uploaded successfully",
+      });
+
+      router.push(`/dashboard/${fileId}`);
+    } catch (error) {
+      console.error("Failed to fetch file:", error);
+    }
+  };
 
   const startSimulatedProgress = () => {
     setUploadProgress(0);
@@ -40,9 +73,28 @@ const UploadDropZone = () => {
   return (
     <DropZone
       multiple={false}
-      onDrop={(acceptedFiles) => {
+      onDrop={async (acceptedFiles) => {
         setUploading(true);
         startSimulatedProgress();
+        const res = await startUpload(acceptedFiles);
+        if (!res) {
+          return toast({
+            title: "Something went wrong",
+            description: "Please try again later",
+            variant: "destructive",
+          });
+        }
+        const [fileResponse] = res;
+        const key = fileResponse?.key;
+        const fileId = fileResponse?.serverData.fileId;
+        if (!key || !fileId) {
+          return toast({
+            title: "Something went wrong",
+            description: "Please try again later",
+            variant: "destructive",
+          });
+        }
+        fetchUploadedFile(fileId, user.id);
       }}
     >
       {({ getRootProps, getInputProps, acceptedFiles }) => (
@@ -83,6 +135,12 @@ const UploadDropZone = () => {
                     />
                   </div>
                 ) : null}
+                <input
+                  {...getInputProps()}
+                  type="file"
+                  id="dropzone-file"
+                  className="hidden"
+                />
               </label>
             </div>
           </div>
@@ -92,7 +150,7 @@ const UploadDropZone = () => {
   );
 };
 
-function UploadButton() {
+function UploadButton({ user }: { user: any }) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog
@@ -112,7 +170,7 @@ function UploadButton() {
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <UploadDropZone />
+        <UploadDropZone user={user} />
       </DialogContent>
     </Dialog>
   );

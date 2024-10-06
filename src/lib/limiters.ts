@@ -35,7 +35,6 @@ export async function rateLimitByIp({
   window: number;
 }) {
   const ip = getIp();
-  console.log(`rateLimitByIp: IP - ${ip}`);
 
   if (!ip) {
     console.error("rateLimitByIp: No IP found, throwing RateLimitError");
@@ -58,21 +57,14 @@ export async function rateLimitByKey({
   limit: number;
   window: number;
 }) {
-  console.log(
-    `rateLimitByKey: Key - ${key}, Limit - ${limit}, Window - ${window}`
-  );
   const tracker = trackers.get(key) || { count: 0, expiresAt: 0 };
 
   if (tracker.expiresAt < Date.now()) {
-    console.log(`rateLimitByKey: Resetting tracker for key - ${key}`);
     tracker.count = 0;
     tracker.expiresAt = Date.now() + window;
   }
 
   tracker.count++;
-  console.log(
-    `rateLimitByKey: Tracker count for key - ${key} is now ${tracker.count}`
-  );
 
   if (tracker.count > limit) {
     console.error(
