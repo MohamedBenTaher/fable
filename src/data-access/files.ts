@@ -2,12 +2,30 @@ import { db } from "@/db";
 import { files, UploadStatus } from "@/db/schema";
 import { UserId } from "@/use-cases/types";
 import { eq, and } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export async function getFile(fileId: number, userId: number) {
   const file = await db
     .select()
     .from(files)
-    .where(and(eq(files.id, fileId), eq(files.userId, userId)));
+    .where(and(eq(files.id, fileId), eq(files.userId, userId)))
+    .limit(1)
+    .then((rows) => rows[0] || null);
+
+  console.log("file found", file);
+  if (!file) {
+    throw new Error("File not found");
+  }
+
+  return file;
+}
+export async function getFileByKey(key: string, userId: number) {
+  const file = await db
+    .select()
+    .from(files)
+    .where(and(eq(files.key, key), eq(files.userId, userId)))
+    .limit(1)
+    .then((rows) => rows[0] || null);
 
   if (!file) {
     throw new Error("File not found");
@@ -48,5 +66,7 @@ export async function createFile(
       uploadedAt: new Date(),
     })
     .returning();
+
+  revalidatePath("/dashboard");
   return file;
 }

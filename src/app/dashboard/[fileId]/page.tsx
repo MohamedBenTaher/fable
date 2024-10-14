@@ -18,6 +18,7 @@ async function Page({ params }: PageProps) {
     redirect("/sign-in");
   }
   const file = await getFile(Number(fileId), user.id);
+  console.log(file);
 
   if (!file) {
     return <div>File not found</div>;
