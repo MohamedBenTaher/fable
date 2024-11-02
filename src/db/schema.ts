@@ -4,6 +4,7 @@ import {
   pgTableCreator,
   timestamp,
   serial,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 export const accountTypeEnum = ["email", "google", "github"] as const;
@@ -113,11 +114,26 @@ export const files = pgTable("files", {
   uploadedAt: timestamp("uploaded_at").notNull(),
 });
 
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, {
+    onDelete: "cascade",
+  }),
+  message: text("message").notNull(),
+  isUserMessage: boolean("is_user_message").notNull(),
+  created_at: timestamp("created_at").notNull(),
+  updated_at: timestamp("updated_at").notNull(),
+  fileId: integer("file_id").references(() => files.id, {
+    onDelete: "cascade",
+  }),
+});
+
 export type User = typeof users.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type Account = typeof accounts.$inferSelect;
 export type MagicLink = typeof magicLinks.$inferSelect;
 export type ResetToken = typeof resetTokens.$inferSelect;
+export type Message = typeof messages.$inferSelect;
 export type VerifyEmailToken = typeof verifyEmailTokens.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 export type File = typeof files.$inferSelect;
