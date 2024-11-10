@@ -1,68 +1,43 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
-import Messages from "./messages";
-import ChatInput from "./chatInput";
-import { useToast } from "@/hooks/use-toast";
+
+import ChatInput from "@/components/chat/chat-input";
+import Messages from "@/components/chat/messages";
 import { ChevronLeft, Loader2, XCircle } from "lucide-react";
-import { buttonVariants } from "../ui/button";
 import Link from "next/link";
+import { buttonVariants } from "../ui/button";
+import { useCallback, useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+
 interface ChatWrapperProps {
-  fileId: number;
-  user: any;
   isSubscribed: boolean;
 }
-function ChatWrapper({ fileId, user, isSubscribed }: ChatWrapperProps) {
-  const [isLoading, setIsLoading] = useState(false);
+
+const ChatWrapper = ({ isSubscribed }: ChatWrapperProps) => {
   const { toast } = useToast();
+  const fileId = 1;
   const [file, setFile] = useState<any>(null);
-  const fetchFileStatus = useCallback(
-    async (fileId: number, userId: number) => {
-      try {
-        setIsLoading(true);
-        const params = new URLSearchParams({
-          fileId: fileId.toString(),
-          userId: userId.toString(),
-        });
+  const [isLoading, setIsLoading] = useState(true);
 
-        const response = await fetch(`/api/files?${params.toString()}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch file");
-        }
-
-        await response.json();
-        setIsLoading(false);
-
-        toast({
-          title: "File uploaded successfully",
-          description: "Your file has been uploaded successfully",
-        });
-      } catch (error) {
-        setIsLoading(false);
-        console.error("Failed to fetch file:", error);
-        toast({
-          title: "Upload failed",
-          description:
-            "There was an error uploading your file. Please try again.",
-          variant: "destructive",
-        });
+  const fetchFile = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/pdf-proxy?fileId=${fileId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setFile(data);
+      } else {
+        throw new Error("Failed to fetch PDF URL");
       }
-    },
-    [toast]
-  );
+    } catch (error) {
+      console.error(error);
+      toast("Failed to fetch PDF URL", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fileId, toast]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await fetchFileStatus(fileId, user.id);
-      setFile(result);
-    };
-    fetchData();
-  }, [fetchFileStatus, fileId, user.id]);
+    fetchFile();
+  }, [fetchFile]);
 
   if (isLoading)
     return (
@@ -76,7 +51,6 @@ function ChatWrapper({ fileId, user, isSubscribed }: ChatWrapperProps) {
             </p>
           </div>
         </div>
-
         <ChatInput isDisabled />
       </div>
     );
@@ -91,7 +65,6 @@ function ChatWrapper({ fileId, user, isSubscribed }: ChatWrapperProps) {
             <p className="text-zinc-500 text-sm">This won&apos;t take long.</p>
           </div>
         </div>
-
         <ChatInput isDisabled />
       </div>
     );
@@ -108,11 +81,7 @@ function ChatWrapper({ fileId, user, isSubscribed }: ChatWrapperProps) {
               <span className="font-medium">
                 {isSubscribed ? "Pro" : "Free"}
               </span>{" "}
-              plan supports up to 5
-              {/* {isSubscribed
-                ? PLANS.find((p) => p.name === "Pro")?.pagesPerPdf
-                : PLANS.find((p) => p.name === "Free")?.pagesPerPdf}{" "} */}
-              pages per PDF.
+              plan supports up to 5 pages per PDF.
             </p>
             <Link
               href="/dashboard"
@@ -126,7 +95,6 @@ function ChatWrapper({ fileId, user, isSubscribed }: ChatWrapperProps) {
             </Link>
           </div>
         </div>
-
         <ChatInput isDisabled />
       </div>
     );
@@ -134,11 +102,11 @@ function ChatWrapper({ fileId, user, isSubscribed }: ChatWrapperProps) {
   return (
     <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
       <div className="flex-1 justify-between flex flex-col mb-28">
-        <Messages />
+        <Messages fileId={fileId.toString()} />
       </div>
       <ChatInput />
     </div>
   );
-}
+};
 
 export default ChatWrapper;

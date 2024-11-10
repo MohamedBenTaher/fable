@@ -89,3 +89,31 @@ export const POST = async (req: NextRequest) => {
 
   return new StreamingTextResponse(stream);
 };
+
+export const GET = async (req: NextRequest) => {
+  const user = await getCurrentUser();
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const { id: userId } = user;
+
+  const { searchParams } = new URL(req.url);
+  const fileId = searchParams.get("fileId");
+  const page = parseInt(searchParams.get("page") || "0", 10);
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
+
+  if (!fileId) {
+    return new Response("Bad Request", { status: 400 });
+  }
+
+  const file = await getFile(Number(fileId), userId);
+
+  if (!file) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  const messages = await getMessages(fileId, userId.toString(), limit, page);
+
+  return new Response(JSON.stringify(messages), { status: 200 });
+};
