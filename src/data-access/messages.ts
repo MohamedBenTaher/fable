@@ -1,40 +1,56 @@
 import { db } from "@/db";
 import { Message, messages } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 export const getMessagesByFileUser = async (
   fileId: string,
   userId: string,
-  limit: number,
+  limit: number = 10,
   page: number = 1
-): Promise<Message[]> => {
-  const offset = page * limit;
+) => {
+  const offset = (page - 1) * limit;
 
-  const Messages = await db
+  const fileMessages = await db
     .select()
     .from(messages)
-    .where(and(eq(messages.fileId, fileId), eq(messages.userId, userId)))
+    .where(
+      and(
+        eq(messages.fileId, parseInt(fileId)),
+        eq(messages.userId, parseInt(userId))
+      )
+    )
+    .orderBy(desc(messages.created_at))
     .limit(limit)
-    .offset(offset)
-    .then((rows) => rows || null);
+    .offset(offset);
 
-  return Messages;
+  return {
+    messages: fileMessages.map((msg) => ({
+      id: msg.id.toString(),
+      text: msg.message,
+      isUserMessage: msg.isUserMessage,
+      createdAt: msg.created_at,
+    })),
+    hasMore: fileMessages.length === limit,
+  };
 };
+
 export const createMessage = async (
-  fileId: string,
   userId: string,
+  fileId: string,
   message: string,
   isUserMessage: boolean
 ): Promise<Message> => {
-  const [Message] = await db
+  const [newMessage] = await db
     .insert(messages)
     .values({
-      fileId: fileId,
-      userId: userId,
+      fileId: Number(fileId),
+      userId: Number(userId),
       isUserMessage: isUserMessage,
       message: message,
+      created_at: new Date(),
+      updated_at: new Date(),
     })
     .returning();
 
-  return Message;
+  return newMessage;
 };

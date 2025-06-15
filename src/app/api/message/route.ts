@@ -6,8 +6,6 @@ import { fetchGroqResponse } from "@/lib/groq";
 import { StreamingTextResponse } from "ai";
 import { getFile } from "@/data-access/files";
 import { createMessage, getMessagesByFileUser } from "@/data-access/messages";
-import { pipeline } from "@huggingface/transformers";
-import { getOrCreateCollection } from "@/lib/chroma";
 
 export const POST = async (req: NextRequest) => {
   try {
@@ -30,21 +28,7 @@ export const POST = async (req: NextRequest) => {
     // Store user message
     await createMessage(userId.toString(), fileId.toString(), message, true);
 
-    // Get embeddings using HuggingFace transformers (free)
-    const embedder = await pipeline(
-      "feature-extraction",
-      "sentence-transformers/all-MiniLM-L6-v2"
-    );
-    const embeddings = await embedder(message);
-
-    // Use Chroma for vector search (free)
-    const collection = await getOrCreateCollection(`file_${file.id}`);
-    const results = await collection.query({
-      queryEmbeddings: [Array.from(embeddings.data)],
-      nResults: 4,
-    });
-
-    // Get previous messages
+    // Get previous messages for context
     const prevMessages = await getMessagesByFileUser(
       fileId.toString(),
       userId.toString(),
@@ -56,10 +40,12 @@ export const POST = async (req: NextRequest) => {
       content: msg.message,
     }));
 
-    // Create context from results
-    const context = results.documents?.[0]?.join("\n\n") || "";
+    // For now, use a simple context approach without embeddings
+    // TODO: Implement proper vector search when we have document processing
+    const context =
+      "Document context will be available once document processing is implemented.";
 
-    // Use Groq for LLM response (free)
+    // Use Groq for LLM response
     const prompt = `Use the following pieces of context (or previous conversation if needed) to answer the user's question in markdown format. If you don't know the answer, just say that you don't know, don't try to make up an answer.
     
     \n----------------\n
@@ -99,45 +85,6 @@ export const POST = async (req: NextRequest) => {
     return new StreamingTextResponse(stream);
   } catch (error) {
     console.error("Error in messages API:", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
-  }
-};
-
-export const GET = async (req: NextRequest) => {
-  try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    const { id: userId } = user;
-
-    const { searchParams } = new URL(req.url);
-    const fileId = searchParams.get("fileId");
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "10", 10);
-
-    if (!fileId) {
-      return new NextResponse("Bad Request", { status: 400 });
-    }
-
-    // Convert fileId string to number for getFile function
-    const file = await getFile(Number(fileId), userId);
-
-    if (!file) {
-      return new NextResponse("File Not Found", { status: 404 });
-    }
-
-    const messages = await getMessagesByFileUser(
-      fileId,
-      userId.toString(),
-      limit,
-      page
-    );
-
-    return new NextResponse(JSON.stringify(messages), { status: 200 });
-  } catch (error) {
-    console.error("Error fetching messages:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 };

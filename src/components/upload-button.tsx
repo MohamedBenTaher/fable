@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 const UploadDropZone = ({ user }: { user: any }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState<string>("");
   const { startUpload } = useUploadThing("pdfUploader");
   const { toast } = useToast();
   const router = useRouter();
@@ -79,6 +80,7 @@ const UploadDropZone = ({ user }: { user: any }) => {
       if (acceptedFiles.length === 0) return;
 
       setUploading(true);
+      setUploadStatus("Uploading...");
       const progressInterval = startSimulatedProgress();
 
       try {
@@ -97,6 +99,7 @@ const UploadDropZone = ({ user }: { user: any }) => {
 
         clearInterval(progressInterval);
         setUploadProgress(100);
+        setUploadStatus("Processing...");
 
         // Wait for a short delay before fetching the uploaded file
         setTimeout(() => {
@@ -106,6 +109,7 @@ const UploadDropZone = ({ user }: { user: any }) => {
         clearInterval(progressInterval);
         setUploading(false);
         setUploadProgress(0);
+        setUploadStatus("");
         console.error("Upload error:", error);
         toast({
           title: "Upload failed",
@@ -162,12 +166,10 @@ const UploadDropZone = ({ user }: { user: any }) => {
                 value={uploadProgress}
                 className="h-1 w-full bg-zinc-200"
               />
-              {uploadProgress === 100 && (
-                <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-center pt-2">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  Processing...
-                </div>
-              )}
+              <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-center pt-2">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                {uploadStatus || "Uploading..."}
+              </div>
             </div>
           )}
         </label>

@@ -8,7 +8,7 @@ interface ChatInputProps {
   isDisabled?: boolean;
 }
 
-const ChatInput = ({ isDisabled }: ChatInputProps) => {
+const ChatInput = ({ isDisabled = false }: ChatInputProps) => {
   const { addMessage, handleInputChange, isLoading, message } =
     useContext(ChatContext);
 
@@ -27,12 +27,11 @@ const ChatInput = ({ isDisabled }: ChatInputProps) => {
                 autoFocus
                 onChange={handleInputChange}
                 value={message}
+                disabled={isLoading || isDisabled}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-
                     addMessage();
-
                     textareaRef.current?.focus();
                   }
                 }}

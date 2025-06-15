@@ -1,21 +1,29 @@
-import { Loader2Icon } from "lucide-react";
-import { Button, ButtonProps } from "@/components/ui/button";
+import React from "react";
+import { Button } from "./ui/button";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+interface LoaderButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  isLoading?: boolean;
+  children: React.ReactNode;
+  className?: string;
+}
+
 export function LoaderButton({
+  isLoading = false,
   children,
-  isLoading,
   className,
+  disabled,
   ...props
-}: ButtonProps & { isLoading: boolean }) {
+}: LoaderButtonProps) {
   return (
     <Button
-      disabled={isLoading}
-      type="submit"
+      className={cn(className)}
+      disabled={isLoading || disabled}
       {...props}
-      className={cn("flex justify-center gap-2 px-3", className)}
     >
-      {isLoading && <Loader2Icon className="h-4 w-4 animate-spin" />}
+      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       {children}
     </Button>
   );

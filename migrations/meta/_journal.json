@@ -1,47 +1,12 @@
 {
-  "version": "1",
-  "dialect": "postgres",
+  "version": "7",
+  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
       "version": "7",
-      "when": 1726316149406,
-      "tag": "0000_light_sasquatch",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1726325851436,
-      "tag": "0001_glorious_rumiko_fujikawa",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1726328175365,
-      "tag": "0002_premium_pandemic",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1726442115646,
-      "tag": "0003_yummy_wither",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1727264856790,
-      "tag": "0004_lively_captain_midlands",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1730059970402,
-      "tag": "0005_mature_red_hulk",
+      "when": 1749991767643,
+      "tag": "0000_talented_mauler",
       "breakpoints": true
     }
   ]

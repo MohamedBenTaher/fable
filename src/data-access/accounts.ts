@@ -2,28 +2,10 @@ import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import { UserId } from "@/use-cases/types";
 import { and, eq } from "drizzle-orm";
-import crypto from "crypto";
-
-const ITERATIONS = 10000;
-
-async function hashPassword(plainTextPassword: string, salt: string) {
-  return new Promise<string>((resolve, reject) => {
-    crypto.pbkdf2(
-      plainTextPassword,
-      salt,
-      ITERATIONS,
-      64,
-      "sha512",
-      (err, derivedKey) => {
-        if (err) reject(err);
-        resolve(derivedKey.toString("hex"));
-      }
-    );
-  });
-}
+import { hashPassword, generateSalt } from "@/lib/password";
 
 export async function createAccount(userId: UserId, password: string) {
-  const salt = crypto.randomBytes(128).toString("base64");
+  const salt = generateSalt();
   const hash = await hashPassword(password, salt);
   const [account] = await db
     .insert(accounts)
@@ -74,7 +56,7 @@ export async function updatePassword(
   password: string,
   trx = db
 ) {
-  const salt = crypto.randomBytes(128).toString("base64");
+  const salt = generateSalt();
   const hash = await hashPassword(password, salt);
   await trx
     .update(accounts)
@@ -95,4 +77,20 @@ export async function getAccountByGithubId(githubId: string) {
   return await db.query.accounts.findFirst({
     where: eq(accounts.githubId, githubId),
   });
+}
+
+export async function fixAccountPassword(
+  userId: UserId,
+  plainTextPassword: string
+) {
+  const salt = generateSalt();
+  const hash = await hashPassword(plainTextPassword, salt);
+
+  await db
+    .update(accounts)
+    .set({
+      password: hash,
+      salt,
+    })
+    .where(and(eq(accounts.userId, userId), eq(accounts.accountType, "email")));
 }

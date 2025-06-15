@@ -1,4 +1,3 @@
-import { db } from "@/db";
 import { getCurrentUser } from "@/lib/session";
 import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,7 +8,10 @@ import { createMessage, getMessagesByFileUser } from "@/data-access/messages";
 import { pipeline } from "@huggingface/transformers";
 import { getOrCreateCollection } from "@/lib/chroma";
 
-export const POST = async (req: NextRequest) => {
+export const POST = async (
+  req: NextRequest,
+  { params }: { params: { fileId: string } }
+) => {
   try {
     const body = await req.json();
     const user = await getCurrentUser();
@@ -19,7 +21,8 @@ export const POST = async (req: NextRequest) => {
     }
 
     const { id: userId } = user;
-    const { fileId, message } = SendMessageValidator.parse(body);
+    const { fileId } = params;
+    const { message } = SendMessageValidator.parse(body);
 
     // Convert fileId string to number for getFile function
     const file = await getFile(Number(fileId), userId);
@@ -28,36 +31,44 @@ export const POST = async (req: NextRequest) => {
     }
 
     // Store user message
-    await createMessage(userId.toString(), fileId.toString(), message, true);
+    await createMessage(userId.toString(), fileId, message, true);
 
-    // Get embeddings using HuggingFace transformers (free)
-    const embedder = await pipeline(
-      "feature-extraction",
-      "sentence-transformers/all-MiniLM-L6-v2"
-    );
-    const embeddings = await embedder(message);
+    let context = "";
+    let groqResponse =
+      "I'm sorry, but I'm having trouble accessing the document content right now. Please try again later.";
 
-    // Use Chroma for vector search (free)
-    const collection = await getOrCreateCollection(`file_${file.id}`);
-    const results = await collection.query({
-      queryEmbeddings: [Array.from(embeddings.data)],
-      nResults: 4,
-    });
+    try {
+      // Get embeddings using HuggingFace transformers (free)
+      const embedder = await pipeline(
+        "feature-extraction",
+        "sentence-transformers/all-MiniLM-L6-v2"
+      );
+      const embeddings = await embedder(message);
+
+      // Use Chroma for vector search (free)
+      const collection = await getOrCreateCollection(`file_${file.id}`);
+      const results = await collection.query({
+        queryEmbeddings: [Array.from(embeddings.data)],
+        nResults: 4,
+      });
+
+      // Create context from results
+      context = results.documents?.[0]?.join("\n\n") || "";
+    } catch (error) {
+      console.warn("Vector search failed, proceeding without context:", error);
+    }
 
     // Get previous messages
     const prevMessages = await getMessagesByFileUser(
-      fileId.toString(),
+      fileId,
       userId.toString(),
       5
     );
 
-    const formattedPrevMessages = prevMessages.map((msg) => ({
+    const formattedPrevMessages = prevMessages.messages.map((msg) => ({
       role: msg.isUserMessage ? "user" : "assistant",
-      content: msg.message,
+      content: msg.text,
     }));
-
-    // Create context from results
-    const context = results.documents?.[0]?.join("\n\n") || "";
 
     // Use Groq for LLM response (free)
     const prompt = `Use the following pieces of context (or previous conversation if needed) to answer the user's question in markdown format. If you don't know the answer, just say that you don't know, don't try to make up an answer.
@@ -77,15 +88,16 @@ export const POST = async (req: NextRequest) => {
     
     USER INPUT: ${message}`;
 
-    const groqResponse = await fetchGroqResponse(prompt);
+    try {
+      groqResponse = await fetchGroqResponse(prompt);
+    } catch (error) {
+      console.error("Groq API failed:", error);
+      groqResponse =
+        "I'm sorry, but I'm experiencing technical difficulties. Please try again later.";
+    }
 
     // Store LLM response
-    await createMessage(
-      userId.toString(),
-      fileId.toString(),
-      groqResponse,
-      false
-    );
+    await createMessage(userId.toString(), fileId, groqResponse, false);
 
     // Create streaming response
     const stream = new ReadableStream({
@@ -103,7 +115,10 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
-export const GET = async (req: NextRequest) => {
+export const GET = async (
+  req: NextRequest,
+  { params }: { params: { fileId: string } }
+) => {
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -111,15 +126,11 @@ export const GET = async (req: NextRequest) => {
     }
 
     const { id: userId } = user;
+    const { fileId } = params;
 
     const { searchParams } = new URL(req.url);
-    const fileId = searchParams.get("fileId");
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
-
-    if (!fileId) {
-      return new NextResponse("Bad Request", { status: 400 });
-    }
 
     // Convert fileId string to number for getFile function
     const file = await getFile(Number(fileId), userId);

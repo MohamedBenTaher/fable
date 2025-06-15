@@ -5,41 +5,28 @@ import Messages from "@/components/chat/messages";
 import { ChevronLeft, Loader2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { getCurrentUserAction } from "@/lib/session-actions";
+import { File } from "@/db/schema";
 
 interface ChatWrapperProps {
+  file: File;
   isSubscribed: boolean;
 }
 
-const ChatWrapper = ({ isSubscribed }: ChatWrapperProps) => {
+const ChatWrapper = ({ file, isSubscribed }: ChatWrapperProps) => {
   const { toast } = useToast();
-  const fileId = 1;
-  const [file, setFile] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchFile = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/pdf-proxy?fileId=${fileId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setFile(data);
-      } else {
-        throw new Error("Failed to fetch PDF URL");
-      }
-    } catch (error) {
-      console.error(error);
-      toast("Failed to fetch PDF URL", "error");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [fileId, toast]);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    fetchFile();
-  }, [fetchFile]);
+    getCurrentUserAction().then(setUser);
+  }, []);
 
-  if (isLoading)
+  // Show loading if file is not provided or still processing
+  const isLoading = !file || file.status === "processing";
+  console.log("file", file);
+  if (!file || file.status === "pending")
     return (
       <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
         <div className="flex-1 flex justify-center items-center flex-col mb-28">
@@ -55,7 +42,7 @@ const ChatWrapper = ({ isSubscribed }: ChatWrapperProps) => {
       </div>
     );
 
-  if (file?.status === "PROCESSING")
+  if (file.status === "processing")
     return (
       <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
         <div className="flex-1 flex justify-center items-center flex-col mb-28">
@@ -69,7 +56,7 @@ const ChatWrapper = ({ isSubscribed }: ChatWrapperProps) => {
       </div>
     );
 
-  if (file?.status === "FAILED")
+  if (file.status === "failed")
     return (
       <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
         <div className="flex-1 flex justify-center items-center flex-col mb-28">
@@ -102,9 +89,9 @@ const ChatWrapper = ({ isSubscribed }: ChatWrapperProps) => {
   return (
     <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
       <div className="flex-1 justify-between flex flex-col mb-28">
-        <Messages fileId={fileId.toString()} />
+        <Messages fileId={file.id.toString()} />
       </div>
-      <ChatInput />
+      <ChatInput isDisabled={file.status !== "complete"} />
     </div>
   );
 };

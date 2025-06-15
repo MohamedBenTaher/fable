@@ -105,7 +105,9 @@ export const files = pgTable("files", {
       onDelete: "cascade",
     })
     .notNull(),
-  status: text("status", { enum: enumToTuple(UploadStatus) }).notNull(),
+  status: text("status", { enum: enumToTuple(UploadStatus) })
+    .notNull()
+    .default("pending"),
   key: text("key").notNull(),
   url: text("url").notNull(),
   fileName: text("file_name").notNull(),
@@ -116,16 +118,12 @@ export const files = pgTable("files", {
 
 export const messages = pgTable("messages", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id, {
-    onDelete: "cascade",
-  }),
+  userId: integer("user_id").notNull(),
+  fileId: integer("file_id").notNull(),
   message: text("message").notNull(),
   isUserMessage: boolean("is_user_message").notNull(),
-  created_at: timestamp("created_at").notNull(),
-  updated_at: timestamp("updated_at").notNull(),
-  fileId: integer("file_id").references(() => files.id, {
-    onDelete: "cascade",
-  }),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export type User = typeof users.$inferSelect;

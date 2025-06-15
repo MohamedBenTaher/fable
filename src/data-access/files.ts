@@ -12,8 +12,23 @@ export async function getFile(fileId: number, userId: number) {
     .limit(1)
     .then((rows) => rows[0] || null);
 
-  console.log("file found", file);
   if (!file) {
+    // Additional logging to help debug
+    const fileWithoutUserCheck = await db
+      .select()
+      .from(files)
+      .where(eq(files.id, fileId))
+      .limit(1)
+      .then((rows) => rows[0] || null);
+
+    if (fileWithoutUserCheck) {
+      console.log(
+        `File ${fileId} exists but belongs to user ${fileWithoutUserCheck.userId}, not ${userId}`
+      );
+    } else {
+      console.log(`File ${fileId} does not exist at all`);
+    }
+
     throw new Error("File not found");
   }
 
@@ -46,20 +61,47 @@ export async function deleteFile(id: number) {
   await db.delete(files).where(eq(files.id, id));
 }
 
+export async function updateFileStatus(fileId: number, status: UploadStatus) {
+  await db.update(files).set({ status }).where(eq(files.id, fileId));
+
+  revalidatePath("/dashboard");
+}
+
+export async function updateFileKeyAndStatus(
+  fileId: number,
+  key: string,
+  status: UploadStatus
+) {
+  await db
+    .update(files)
+    .set({
+      key,
+      url: `https://uploadthing-prod.s3.us-west-2.amazonaws.com/${key}`,
+      status,
+    })
+    .where(eq(files.id, fileId));
+  revalidatePath("/dashboard");
+}
+
 export async function createFile(
   userId: UserId,
   key: string,
   fileName: string,
-
   size: number
 ) {
+  console.log(
+    `Creating file for userId: ${userId}, key: ${key}, fileName: ${fileName}`
+  );
+
   const [file] = await db
     .insert(files)
     .values({
       userId: userId,
-      key: key,
-      url: `https://uploadthing-prod.s3.us-west-2.amazonaws.com/${key}`,
-      status: UploadStatus.Pending,
+      key: key || "",
+      url: key
+        ? `https://uploadthing-prod.s3.us-west-2.amazonaws.com/${key}`
+        : "",
+      status: "processing" as UploadStatus, // Set to processing initially
       fileName: fileName,
       mimeType: "application/pdf",
       size: size,
@@ -67,6 +109,7 @@ export async function createFile(
     })
     .returning();
 
+  console.log(`Created file:`, file);
   revalidatePath("/dashboard");
   return file;
 }

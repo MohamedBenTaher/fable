@@ -1,9 +1,9 @@
 import { db } from "@/db";
 import { User, accounts, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import crypto from "crypto";
 import { UserId } from "@/use-cases/types";
 import { getAccountByUserId } from "@/data-access/accounts";
+import { hashPassword } from "@/lib/password";
 
 const ITERATIONS = 10000;
 // const MAGIC_LINK_TOKEN_TTL = 1000 * 60 * 5; // 5 min
@@ -18,22 +18,6 @@ export async function getUser(userId: UserId) {
   });
 
   return user;
-}
-
-async function hashPassword(plainTextPassword: string, salt: string) {
-  return new Promise<string>((resolve, reject) => {
-    crypto.pbkdf2(
-      plainTextPassword,
-      salt,
-      ITERATIONS,
-      64,
-      "sha512",
-      (err, derivedKey) => {
-        if (err) reject(err);
-        resolve(derivedKey.toString("hex"));
-      }
-    );
-  });
 }
 
 export async function createUser(email: string) {
@@ -74,12 +58,20 @@ export async function verifyPassword(email: string, plainTextPassword: string) {
   const user = await getUserByEmail(email);
 
   if (!user) {
+    console.log("verifyPassword: User not found");
     return false;
   }
 
   const account = await getAccountByUserId(user.id);
 
   if (!account) {
+    console.log("verifyPassword: Account not found");
+    return false;
+  }
+
+  // Check if account type is email
+  if (account.accountType !== "email") {
+    console.log("verifyPassword: Account is not email type");
     return false;
   }
 
@@ -87,11 +79,14 @@ export async function verifyPassword(email: string, plainTextPassword: string) {
   const savedPassword = account.password;
 
   if (!salt || !savedPassword) {
+    console.log("verifyPassword: Missing salt or password");
     return false;
   }
 
   const hash = await hashPassword(plainTextPassword, salt);
-  return account.password == hash;
+  const isValid = account.password === hash;
+  console.log("verifyPassword: Password verification result:", isValid);
+  return isValid;
 }
 
 export async function getUserByEmail(email: string) {

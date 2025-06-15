@@ -1,6 +1,10 @@
 services:
   db:
-    image: postgres
+    image: postgres:15
+    environment:
+      POSTGRES_DB: fable
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
     env_file:
       - .env
     ports:

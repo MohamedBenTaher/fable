@@ -4,7 +4,6 @@ import { useIntersection } from "@mantine/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2, MessageSquare } from "lucide-react";
 import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query";
-import { getMessagesByFile } from "@/use-cases/messages";
 import Message from "./message";
 import Skeleton from "react-loading-skeleton";
 
@@ -24,11 +23,12 @@ export function Messages({ fileId }: MessagesProps) {
         const response = await fetch(
           `/api/files/${fileId}/messages?limit=${INFINITE_QUERY_LIMIT}&page=${pageParam}`
         );
-        return response.json();
+        const data = await response.json();
+        return data;
       },
 
       getNextPageParam: (lastPage, pages) => {
-        if (lastPage.length < INFINITE_QUERY_LIMIT) {
+        if (!lastPage.hasMore) {
           return undefined;
         }
         return pages.length + 1;
@@ -81,7 +81,7 @@ export function Messages({ fileId }: MessagesProps) {
                 ref={ref}
                 message={message}
                 isNextMessageSamePerson={isNextMessageSamePerson}
-                key={message.id}
+                key={message?.id}
               />
             );
           } else
@@ -89,7 +89,7 @@ export function Messages({ fileId }: MessagesProps) {
               <Message
                 message={message}
                 isNextMessageSamePerson={isNextMessageSamePerson}
-                key={message.id}
+                key={message?.id}
               />
             );
         })

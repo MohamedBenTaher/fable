@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
 import { getFile } from "@/data-access/files";
 import { UTApi } from "uploadthing/server";
-
-// Initialize the UploadThing API
-const utapi = new UTApi();
+import { env } from "@/env";
 
 export async function GET(request: NextRequest) {
   const fileId = request.nextUrl.searchParams.get("fileId");
@@ -23,6 +21,11 @@ export async function GET(request: NextRequest) {
     if (!file) {
       return new NextResponse("File not found", { status: 404 });
     }
+
+    // Initialize the UploadThing API with token
+    const utapi = new UTApi({
+      token: env.UPLOADTHING_TOKEN,
+    });
 
     // Get the temporary URL for the file
     const signedUrlResponse = await utapi.getSignedURL(file.key);
