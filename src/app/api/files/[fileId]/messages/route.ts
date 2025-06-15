@@ -5,8 +5,8 @@ import { fetchGroqResponse } from "@/lib/groq";
 import { StreamingTextResponse } from "ai";
 import { getFile } from "@/data-access/files";
 import { createMessage, getMessagesByFileUser } from "@/data-access/messages";
-import { pipeline } from "@huggingface/transformers";
 import { getOrCreateCollection } from "@/lib/chroma";
+import { getEmbeddings } from "@/lib/embeddings";
 
 export const POST = async (
   req: NextRequest,
@@ -24,13 +24,13 @@ export const POST = async (
     const { fileId } = params;
     const { message } = SendMessageValidator.parse(body);
 
-    // Convert fileId string to number for getFile function
+    console.log(`Processing message for file ${fileId}: "${message}"`);
+
     const file = await getFile(Number(fileId), userId);
     if (!file) {
       return new Response("Not found", { status: 404 });
     }
 
-    // Store user message
     await createMessage(userId.toString(), fileId, message, true);
 
     let context = "";
@@ -38,24 +38,83 @@ export const POST = async (
       "I'm sorry, but I'm having trouble accessing the document content right now. Please try again later.";
 
     try {
-      // Get embeddings using HuggingFace transformers (free)
-      const embedder = await pipeline(
-        "feature-extraction",
-        "sentence-transformers/all-MiniLM-L6-v2"
+      console.log("Starting vector search...");
+
+      // Use centralized embedding function for consistency
+      const embeddingArray = await getEmbeddings(message);
+      console.log(
+        `Generated query embedding with dimension: ${embeddingArray.length}`
       );
-      const embeddings = await embedder(message);
 
-      // Use Chroma for vector search (free)
       const collection = await getOrCreateCollection(`file_${file.id}`);
-      const results = await collection.query({
-        queryEmbeddings: [Array.from(embeddings.data)],
-        nResults: 4,
-      });
 
-      // Create context from results
-      context = results.documents?.[0]?.join("\n\n") || "";
+      const count = await collection.count();
+      console.log(`Collection file_${file.id} contains ${count} items`);
+
+      if (count === 0) {
+        console.warn("Collection is empty - no embeddings found");
+        context =
+          "No document content has been processed yet. Please ensure the PDF was uploaded successfully.";
+      } else {
+        console.log("Performing vector search...");
+        const results = await collection.query({
+          queryEmbeddings: [embeddingArray],
+          nResults: Math.min(4, count),
+          include: ["documents", "metadatas", "distances"],
+        });
+
+        console.log(
+          `Vector search returned ${
+            results.documents?.[0]?.length || 0
+          } results`
+        );
+
+        if (
+          results.documents &&
+          results.documents[0] &&
+          results.documents[0].length > 0
+        ) {
+          const documentsWithDistance = results.documents[0].map(
+            (doc: string, index: number) => ({
+              document: doc,
+              distance: results.distances?.[0]?.[index] || 1,
+              metadata: results.metadatas?.[0]?.[index],
+            })
+          );
+
+          const relevantDocs = documentsWithDistance
+            .filter((item: { distance: number }) => item.distance < 0.8)
+            .sort(
+              (a: { distance: number }, b: { distance: number }) =>
+                a.distance - b.distance
+            )
+            .slice(0, 3);
+
+          if (relevantDocs.length > 0) {
+            context = relevantDocs
+              .map((item: { document: string }) => item.document)
+              .join("\n\n");
+            console.log(
+              `Found ${relevantDocs.length} relevant chunks, context length: ${context.length}`
+            );
+            console.log(`Context preview: ${context.substring(0, 200)}...`);
+          } else {
+            console.warn(
+              "No relevant chunks found based on similarity threshold"
+            );
+            context =
+              "I found the document content but it doesn't seem directly relevant to your question.";
+          }
+        } else {
+          console.warn("Vector search returned no documents");
+          context =
+            "The document was processed but no relevant content was found for your question.";
+        }
+      }
     } catch (error) {
       console.warn("Vector search failed, proceeding without context:", error);
+      context =
+        "I'm having trouble searching the document content. I'll try to answer based on general knowledge.";
     }
 
     // Get previous messages
@@ -70,26 +129,32 @@ export const POST = async (
       content: msg.text,
     }));
 
-    // Use Groq for LLM response (free)
-    const prompt = `Use the following pieces of context (or previous conversation if needed) to answer the user's question in markdown format. If you don't know the answer, just say that you don't know, don't try to make up an answer.
-    
-    \n----------------\n
-    
-    PREVIOUS CONVERSATION:
-    ${formattedPrevMessages.map((message) => {
-      if (message.role === "user") return `User: ${message.content}\n`;
-      return `Assistant: ${message.content}\n`;
-    })}
-    
-    \n----------------\n
-    
-    CONTEXT:
-    ${context}
-    
-    USER INPUT: ${message}`;
+    // Use Groq for LLM response with improved prompt
+    const prompt = `You are an AI assistant helping users understand their uploaded documents. Use the following context from the document and previous conversation to answer the user's question in markdown format.
+
+DOCUMENT CONTEXT:
+${context}
+
+PREVIOUS CONVERSATION:
+${formattedPrevMessages
+  .map((message) => {
+    if (message.role === "user") return `User: ${message.content}`;
+    return `Assistant: ${message.content}`;
+  })
+  .join("\n")}
+
+USER QUESTION: ${message}
+
+Instructions:
+- If the context contains relevant information, use it to provide a detailed answer
+- If the context is not relevant, say so and provide what general help you can
+- Be specific and reference details from the document when possible
+- Use markdown formatting for better readability`;
 
     try {
+      console.log("Sending request to Groq...");
       groqResponse = await fetchGroqResponse(prompt);
+      console.log(`Groq response length: ${groqResponse.length}`);
     } catch (error) {
       console.error("Groq API failed:", error);
       groqResponse =
