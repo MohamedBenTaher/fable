@@ -16,7 +16,6 @@ const PdfFullscreen = ({ fileUrl }: PdfFullscreenProps) => {
   const [numPages, setNumPages] = useState<number>();
 
   const { toast } = useToast();
-
   const { width, ref } = useResizeDetector();
 
   return (
@@ -29,13 +28,22 @@ const PdfFullscreen = ({ fileUrl }: PdfFullscreenProps) => {
       }}
     >
       <DialogTrigger onClick={() => setIsOpen(true)} asChild>
-        <Button variant="ghost" className="gap-1.5" aria-label="fullscreen">
-          <Expand className="h-4 w-4" />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-6 p-0"
+          aria-label="fullscreen"
+        >
+          <Expand className="h-3 w-3" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-7xl w-full">
-        <SimpleBar autoHide={false} className="max-h-[calc(100vh-10rem)] mt-6">
-          <div ref={ref}>
+      <DialogContent className="max-w-7xl w-full h-[90vh]">
+        <SimpleBar
+          autoHide={false}
+          className="max-h-[calc(90vh-4rem)] mt-6"
+          style={{ maxHeight: "calc(90vh - 4rem)" }}
+        >
+          <div ref={ref} className="pb-4">
             <Document
               loading={
                 <div className="flex justify-center">
@@ -54,7 +62,13 @@ const PdfFullscreen = ({ fileUrl }: PdfFullscreenProps) => {
               className="max-h-full"
             >
               {new Array(numPages).fill(0).map((_, i) => (
-                <Page key={i} width={width ? width : 1} pageNumber={i + 1} />
+                <Page
+                  key={i}
+                  width={width ? Math.min(width - 32, 800) : 600}
+                  pageNumber={i + 1}
+                  scale={1.2} // Slightly larger scale for fullscreen
+                  className="mb-4 shadow-lg"
+                />
               ))}
             </Document>
           </div>

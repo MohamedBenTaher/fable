@@ -20,7 +20,17 @@ const ChatWrapper = ({ file, isSubscribed }: ChatWrapperProps) => {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    getCurrentUserAction().then(setUser);
+    getCurrentUserAction()
+      .then(setUser)
+      .catch((error) => {
+        console.error("Failed to fetch user:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch user information.",
+          variant: "destructive",
+        });
+      });
+    // No return statement here
   }, []);
 
   // Show loading if file is not provided or still processing
@@ -87,11 +97,26 @@ const ChatWrapper = ({ file, isSubscribed }: ChatWrapperProps) => {
     );
 
   return (
-    <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
-      <div className="flex-1 justify-between flex flex-col mb-28">
+    <div className="h-full flex flex-col bg-white">
+      {/* Chat Header */}
+      <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200 bg-white">
+        <h2 className="text-lg font-semibold text-gray-900 truncate">
+          {file.fileName}
+        </h2>
+        <p className="text-sm text-gray-500">
+          {file.status === "complete" ? "Ready to chat" : "Processing..."}
+        </p>
+      </div>
+
+      {/* Messages Area */}
+      <div className="flex-1 overflow-hidden min-h-0">
         <Messages fileId={file.id.toString()} />
       </div>
-      <ChatInput isDisabled={file.status !== "complete"} />
+
+      {/* Chat Input */}
+      <div className="flex-shrink-0 border-t border-gray-200 bg-white">
+        <ChatInput isDisabled={file.status !== "complete"} />
+      </div>
     </div>
   );
 };

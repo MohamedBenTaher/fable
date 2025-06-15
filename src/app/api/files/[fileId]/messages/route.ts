@@ -82,13 +82,14 @@ export const POST = async (
             })
           );
 
+          // Be more lenient with similarity threshold to capture more context
           const relevantDocs = documentsWithDistance
-            .filter((item: { distance: number }) => item.distance < 0.8)
+            .filter((item: { distance: number }) => item.distance < 1.2)
             .sort(
               (a: { distance: number }, b: { distance: number }) =>
                 a.distance - b.distance
             )
-            .slice(0, 3);
+            .slice(0, 5); // Increased from 3 to 5 for more context
 
           if (relevantDocs.length > 0) {
             context = relevantDocs
@@ -130,7 +131,7 @@ export const POST = async (
     }));
 
     // Use Groq for LLM response with improved prompt
-    const prompt = `You are an AI assistant helping users understand their uploaded documents. Use the following context from the document and previous conversation to answer the user's question in markdown format.
+    const prompt = `You are an AI assistant helping users understand their uploaded documents. Use the following context from the document and previous conversation to answer the user's question thoroughly.
 
 DOCUMENT CONTEXT:
 ${context}
@@ -146,10 +147,13 @@ ${formattedPrevMessages
 USER QUESTION: ${message}
 
 Instructions:
-- If the context contains relevant information, use it to provide a detailed answer
-- If the context is not relevant, say so and provide what general help you can
-- Be specific and reference details from the document when possible
-- Use markdown formatting for better readability`;
+- Read through ALL the document context carefully before answering
+- If the context contains relevant information, provide a detailed and complete answer
+- Quote specific details from the document when possible
+- If you find partial information, mention what you found and what might be missing
+- Be thorough in your search through the provided context
+- Use markdown formatting for better readability
+- If the context doesn't contain the answer, clearly state that after thoroughly checking`;
 
     try {
       console.log("Sending request to Groq...");

@@ -24,16 +24,17 @@ async function Page({ params }: PageProps) {
 
   return (
     <div className="flex-1 justify-between flex flex-col h-[calc(100vh-3.5rem)]">
-      <div className="mx-auto w-full max-w-8xl grow lg:flex xl:px-2">
-        {/* Left sidebar & main wrapper */}
-        <div className="shrink-0 flex-[0.75] border-t border-gray-200 lg:w-96 lg:border-l lg:border-t-0">
+      <div className="mx-auto w-full max-w-8xl grow flex flex-col lg:flex-row xl:px-2 h-full">
+        {/* Chat sidebar - responsive */}
+        <div className="flex-1 lg:flex-[0.5] border-t border-gray-200 lg:border-l lg:border-t-0 h-full lg:h-auto">
           <ChatContextProvider fileId={file.id}>
             <ChatWrapper file={file} isSubscribed={false} />
           </ChatContextProvider>
         </div>
-        <div className="flex-1 xl:flex">
-          <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6">
-            {/* Main area */}
+
+        {/* PDF renderer - responsive */}
+        <div className="flex-1 lg:flex-[0.5] border-t lg:border-t border-gray-200 h-full lg:h-auto">
+          <div className="h-full">
             <PdfRenderer file={file} />
           </div>
         </div>

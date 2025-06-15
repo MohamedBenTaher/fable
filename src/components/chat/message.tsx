@@ -15,66 +15,99 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(
     return (
       <div
         ref={ref}
-        className={cn("flex items-end", {
+        className={cn("flex items-end space-x-2 animate-fade-up", {
           "justify-end": message?.isUserMessage,
+          "justify-start": !message?.isUserMessage,
         })}
       >
-        <div
-          className={cn(
-            "relative flex h-6 w-6 aspect-square items-center justify-center",
-            {
-              "order-2 bg-blue-600 rounded-sm": message?.isUserMessage,
-              "order-1 bg-zinc-800 rounded-sm": !message?.isUserMessage,
-              invisible: isNextMessageSamePerson,
-            }
-          )}
-        >
-          {message?.isUserMessage ? (
-            <Icons.user className="fill-zinc-200 text-zinc-200 h-3/4 w-3/4" />
-          ) : (
-            <Icons.logo className="fill-zinc-300 h-3/4 w-3/4" />
-          )}
-        </div>
+        {/* Avatar */}
+        {!message?.isUserMessage && (
+          <div
+            className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-gray-700 to-gray-800",
+              {
+                "opacity-0": isNextMessageSamePerson,
+              }
+            )}
+          >
+            <Icons.logo className="w-5 h-5 text-white" />
+          </div>
+        )}
 
+        {/* Message Content */}
         <div
-          className={cn("flex flex-col space-y-2 text-base max-w-md mx-2", {
-            "order-1 items-end": message?.isUserMessage,
-            "order-2 items-start": !message?.isUserMessage,
+          className={cn("max-w-[85%] sm:max-w-[70%]", {
+            "order-1": message?.isUserMessage,
+            "order-2": !message?.isUserMessage,
           })}
         >
           <div
-            className={cn("px-4 py-2 rounded-lg inline-block", {
+            className={cn("px-4 py-3 rounded-2xl shadow-sm", {
               "bg-blue-600 text-white": message?.isUserMessage,
-              "bg-gray-200 text-gray-900": !message?.isUserMessage,
-              "rounded-br-none":
+              "bg-white text-gray-900 border border-gray-200":
+                !message?.isUserMessage,
+              "rounded-br-md":
                 !isNextMessageSamePerson && message?.isUserMessage,
-              "rounded-bl-none":
+              "rounded-bl-md":
                 !isNextMessageSamePerson && !message?.isUserMessage,
             })}
           >
             {typeof message?.text === "string" ? (
               <ReactMarkdown
-                className={cn("prose", {
-                  "text-zinc-50": message?.isUserMessage,
+                className={cn("prose prose-sm max-w-none", {
+                  "prose-invert": message?.isUserMessage,
                 })}
+                components={{
+                  p: ({ children }) => (
+                    <p className="mb-2 last:mb-0">{children}</p>
+                  ),
+                  code: ({ children }) => (
+                    <code
+                      className={cn(
+                        "px-1.5 py-0.5 rounded text-sm font-mono",
+                        message?.isUserMessage
+                          ? "bg-blue-500 text-blue-100"
+                          : "bg-gray-100 text-gray-800"
+                      )}
+                    >
+                      {children}
+                    </code>
+                  ),
+                }}
               >
                 {message?.text}
               </ReactMarkdown>
             ) : (
               message?.text
             )}
-            {message?.id !== "loading-message" ? (
-              <div
-                className={cn("text-xs select-none mt-2 w-full text-right", {
-                  "text-zinc-500": !message?.isUserMessage,
-                  "text-blue-300": message?.isUserMessage,
-                })}
-              >
-                {format(new Date(message?.createdAt ?? 0), "HH:mm")}
-              </div>
-            ) : null}
           </div>
+
+          {/* Timestamp */}
+          {message?.id !== "loading-message" && !isNextMessageSamePerson && (
+            <div
+              className={cn("text-xs text-gray-500 mt-1 px-1", {
+                "text-right": message?.isUserMessage,
+                "text-left": !message?.isUserMessage,
+              })}
+            >
+              {format(new Date(message?.createdAt ?? 0), "HH:mm")}
+            </div>
+          )}
         </div>
+
+        {/* User Avatar */}
+        {message?.isUserMessage && (
+          <div
+            className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-blue-500 to-blue-600",
+              {
+                "opacity-0": isNextMessageSamePerson,
+              }
+            )}
+          >
+            <Icons.user className="w-5 h-5 text-white" />
+          </div>
+        )}
       </div>
     );
   }
