@@ -12,6 +12,7 @@ const nextConfig = {
         chromadb: "commonjs chromadb",
         "onnxruntime-node": "commonjs onnxruntime-node",
         "@huggingface/transformers": "commonjs @huggingface/transformers",
+        "@google/generative-ai": "commonjs @google/generative-ai",
       });
     }
 
@@ -44,6 +45,7 @@ const nextConfig = {
       "@huggingface/transformers",
       "uploadthing",
       "pdf-parse",
+      "@google/generative-ai",
     ],
   },
 };
