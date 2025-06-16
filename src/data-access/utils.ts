@@ -15,8 +15,8 @@ export async function generateRandomToken(length: number) {
   return buf.toString("hex").slice(0, length);
 }
 
-export async function createTransaction<T extends typeof db>(
-  cb: (trx: T) => void
-) {
-  await db.transaction(cb as any);
+export async function createTransaction<T>(
+  cb: (trx: typeof db) => Promise<T>
+): Promise<T> {
+  return await db.transaction(cb);
 }

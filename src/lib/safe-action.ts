@@ -3,15 +3,24 @@ import { assertAuthenticated } from "@/lib/session";
 import { createServerActionProcedure } from "zsa";
 import { PublicError } from "../use-cases/errors";
 
-function shapeErrors({ err }: any) {
-  const isAllowedError = err instanceof PublicError;
-  // let's all errors pass through to the UI so debugging locally is easier
+interface ErrorWithCode extends Error {
+  code?: string;
+}
+
+function shapeErrors(args: { err: unknown; typedData: unknown; ctx: unknown }) {
+  const { err } = args;
   const isDev = env.NODE_ENV === "development";
-  if (isAllowedError || isDev) {
+  if (err instanceof PublicError) {
     console.error(err);
     return {
-      code: err.code ?? "ERROR",
+      code: (err as ErrorWithCode).code ?? "ERROR",
       message: `${isDev ? "DEV ONLY ENABLED - " : ""}${err.message}`,
+    };
+  } else if (isDev && err instanceof Error) {
+    console.error(err);
+    return {
+      code: (err as ErrorWithCode).code ?? "ERROR",
+      message: `DEV ONLY ENABLED - ${err.message}`,
     };
   } else {
     return {

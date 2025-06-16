@@ -30,8 +30,8 @@ export const env = createEnv({
     NEXT_PUBLIC_PADDLE_ENVIRONMENT: z
       .enum(["sandbox", "production"])
       .default("sandbox"),
-    NEXT_PUBLIC_PADDLE_PRO_PRICE_ID: z.string().optional(),
-    NEXT_PUBLIC_PADDLE_ENTERPRISE_PRICE_ID: z.string().optional(),
+    NEXT_PUBLIC_PADDLE_PRO_PRICE_ID: z.string().min(1),
+    NEXT_PUBLIC_PADDLE_ENTERPRISE_PRICE_ID: z.string().min(1),
     NEXT_PUBLIC_PADDLE_CLIENT_TOKEN: z.string().optional(),
   },
   runtimeEnv: {

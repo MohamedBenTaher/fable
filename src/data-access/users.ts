@@ -5,7 +5,6 @@ import { UserId } from "@/use-cases/types";
 import { getAccountByUserId } from "@/data-access/accounts";
 import { hashPassword } from "@/lib/password";
 
-const ITERATIONS = 10000;
 // const MAGIC_LINK_TOKEN_TTL = 1000 * 60 * 5; // 5 min
 
 export async function deleteUser(userId: UserId) {

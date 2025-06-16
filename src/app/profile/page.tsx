@@ -28,13 +28,7 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { getCurrentUserAction } from "@/lib/session-actions";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -48,9 +42,22 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
+interface User {
+  id: number;
+  email: string;
+  userType?: string;
+}
+
+interface Profile {
+  displayName?: string;
+  country?: string;
+  bio?: string;
+  image?: string;
+}
+
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [profileCompletion, setProfileCompletion] = useState(0);
@@ -68,27 +75,30 @@ export default function ProfilePage() {
 
   // Calculate profile completion percentage
   useEffect(() => {
-    const values = form.watch();
-    let completed = 0;
-    const total = 3;
+    const subscription = form.watch((value) => {
+      let completed = 0;
+      const total = 3;
 
-    if (values.displayName?.trim()) completed++;
-    if (values.country?.trim()) completed++;
-    if (values.bio?.trim()) completed++;
+      if (value.displayName?.trim()) completed++;
+      if (value.country?.trim()) completed++;
+      if (value.bio?.trim()) completed++;
 
-    setProfileCompletion((completed / total) * 100);
-  }, [form.watch()]);
+      setProfileCompletion((completed / total) * 100);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   useEffect(() => {
     const fetchUserAndProfile = async () => {
       try {
         const userData = await getCurrentUserAction();
         if (userData) {
-          setUser(userData);
+          setUser(userData as User);
 
           const profileResponse = await fetch(`/api/profile/${userData.id}`);
           if (profileResponse.ok) {
-            const profileData = await profileResponse.json();
+            const profileData: Profile = await profileResponse.json();
             setProfile(profileData);
             form.reset({
               displayName: profileData.displayName || "",

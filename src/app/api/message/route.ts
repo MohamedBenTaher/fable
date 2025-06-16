@@ -1,4 +1,3 @@
-import { db } from "@/db";
 import { getCurrentUser } from "@/lib/session";
 import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
 import { NextRequest, NextResponse } from "next/server";
@@ -35,9 +34,9 @@ export const POST = async (req: NextRequest) => {
       5
     );
 
-    const formattedPrevMessages = prevMessages.map((msg) => ({
+    const formattedPrevMessages = prevMessages.messages.map((msg) => ({
       role: msg.isUserMessage ? "user" : "assistant",
-      content: msg.message,
+      content: msg.text,
     }));
 
     // For now, use a simple context approach without embeddings

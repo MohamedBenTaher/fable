@@ -17,10 +17,11 @@ export enum UploadStatus {
   Failed = "failed",
 }
 
-function enumToArray(enumObj: any): string[] {
+function enumToArray(enumObj: Record<string, string>): string[] {
   return Object.values(enumObj).filter((value) => typeof value === "string");
 }
-function enumToTuple(enumObj: any): [string, ...string[]] {
+
+function enumToTuple(enumObj: Record<string, string>): [string, ...string[]] {
   const array = enumToArray(enumObj);
   if (array.length === 0) {
     throw new Error("Enum must have at least one value");

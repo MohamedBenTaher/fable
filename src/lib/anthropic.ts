@@ -25,6 +25,8 @@ export async function fetchAnthropicResponse({
     throw new Error("Failed to fetch response from Anthropic Claude");
   }
 
-  const data = await response.json();
+  const data = await response.json() as {
+    choices: { text: string }[];
+  };
   return data.choices[0].text.trim(); // Return the generated text
 }

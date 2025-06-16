@@ -28,7 +28,7 @@ function Navbar() {
 
   useEffect(() => {
     getCurrentUserAction()
-      .then((userData: User) => {
+      .then((userData: { id: number; role: string | null; email: string; emailVerified: Date | null; userType: "free" | "premium"; } | null | undefined) => {
         console.log("userData", userData);
         if (
           userData &&

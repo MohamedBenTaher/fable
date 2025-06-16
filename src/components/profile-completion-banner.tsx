@@ -6,10 +6,19 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getCurrentUserAction } from "@/lib/session-actions";
 
+interface User {
+  id: number;
+  email: string;
+}
+
+interface Profile {
+  displayName?: string;
+  country?: string;
+  bio?: string;
+}
+
 export default function ProfileCompletionBanner() {
   const [isVisible, setIsVisible] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
   const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
@@ -24,13 +33,10 @@ export default function ProfileCompletionBanner() {
 
         const userData = await getCurrentUserAction();
         if (userData) {
-          setUser(userData);
-
           // Fetch profile data
           const profileResponse = await fetch(`/api/profile/${userData.id}`);
           if (profileResponse.ok) {
-            const profileData = await profileResponse.json();
-            setProfile(profileData);
+            const profileData: Profile = await profileResponse.json();
 
             // Show banner if profile is incomplete
             const isProfileIncomplete =

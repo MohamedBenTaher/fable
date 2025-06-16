@@ -7,7 +7,7 @@ import FileListWrapper from "./file-list-wrapper";
 import Skeleton from "react-loading-skeleton";
 
 export default async function DashboardPage() {
-  const user: User | null = await getCurrentUser();
+  const user: User | null = await getCurrentUser() ?? null;
   if (!user) redirect("/sign-in");
 
   return (

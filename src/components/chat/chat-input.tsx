@@ -25,7 +25,6 @@ const ChatInput = ({ isDisabled = false }: ChatInputProps) => {
               <Textarea
                 rows={1}
                 ref={textareaRef}
-                maxRows={4}
                 autoFocus
                 onChange={handleInputChange}
                 value={message}

@@ -12,7 +12,7 @@ const CreateConversationValidator = z.object({
   description: z.string().optional().default(""),
 });
 
-export const GET = async (req: NextRequest) => {
+export const GET = async () => {
   try {
     const user = await getCurrentUser();
     if (!user) {

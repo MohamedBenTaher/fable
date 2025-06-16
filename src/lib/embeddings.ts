@@ -1,18 +1,27 @@
 import { pipeline } from "@huggingface/transformers";
 
-let embedder: any = null;
+interface EmbeddingModel {
+  (text: string, options?: EmbeddingOptions): Promise<EmbeddingResult>;
+}
 
-export async function getEmbedder() {
+interface EmbeddingOptions {
+  pooling?: string;
+  normalize?: boolean;
+}
+
+interface EmbeddingResult {
+  data?: number[];
+  tolist?: () => number[] | number[][];
+}
+
+let embedder: EmbeddingModel | null = null;
+
+export async function getEmbedder(): Promise<EmbeddingModel> {
   if (!embedder) {
-    embedder = await pipeline(
+    embedder = (await pipeline(
       "feature-extraction",
-      "sentence-transformers/all-MiniLM-L6-v2",
-      {
-        quantized: false,
-        pooling: "mean", // Add explicit pooling
-        normalize: true, // Normalize embeddings
-      } as any
-    );
+      "sentence-transformers/all-MiniLM-L6-v2"
+    )) as EmbeddingModel;
   }
   return embedder;
 }
@@ -41,10 +50,14 @@ export async function getEmbeddings(text: string): Promise<number[]> {
     } else if (embedding.tolist) {
       // Handle tensor with tolist method
       const listed = embedding.tolist();
-      embeddingArray = Array.isArray(listed[0]) ? listed[0] : listed;
+      if (Array.isArray(listed[0])) {
+        embeddingArray = listed[0] as number[];
+      } else {
+        embeddingArray = listed as number[];
+      }
     } else {
-      // Fallback
-      embeddingArray = Array.from(embedding);
+      // Fallback: EmbeddingResult is not iterable or array-like, so throw an error
+      throw new Error("Unknown embedding output format");
     }
 
     // Ensure we have a flat array of numbers

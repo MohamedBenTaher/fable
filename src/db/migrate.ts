@@ -2,7 +2,6 @@ import "dotenv/config";
 import { db, pool } from "./index";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as fs from "fs";
-import * as path from "path";
 
 (async () => {
   try {

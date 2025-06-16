@@ -4,6 +4,23 @@ import { ReactNode, createContext, useRef, useState } from "react";
 import { useToast } from "../ui/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+interface MessageData {
+  createdAt: string;
+  id: string;
+  text: string;
+  isUserMessage: boolean;
+}
+
+interface PageData {
+  messages: MessageData[];
+  hasMore: boolean;
+}
+
+interface QueryData {
+  pages: PageData[];
+  pageParams: number[];
+}
+
 type StreamResponse = {
   addMessage: () => void;
   message: string;
@@ -83,46 +100,49 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
       ]);
 
       // Optimistically update to the new value
-      queryClient.setQueryData(["messages", fileId.toString()], (old: any) => {
-        if (!old) {
+      queryClient.setQueryData(
+        ["messages", fileId.toString()],
+        (old: QueryData | undefined) => {
+          if (!old) {
+            return {
+              pages: [
+                {
+                  messages: [
+                    {
+                      createdAt: new Date().toISOString(),
+                      id: crypto.randomUUID(),
+                      text: message,
+                      isUserMessage: true,
+                    },
+                  ],
+                  hasMore: false,
+                },
+              ],
+              pageParams: [1],
+            };
+          }
+
+          const newPages = [...old.pages];
+          const latestPage = newPages[0]!;
+
+          latestPage.messages = [
+            {
+              createdAt: new Date().toISOString(),
+              id: crypto.randomUUID(),
+              text: message,
+              isUserMessage: true,
+            },
+            ...latestPage.messages,
+          ];
+
+          newPages[0] = latestPage;
+
           return {
-            pages: [
-              {
-                messages: [
-                  {
-                    createdAt: new Date().toISOString(),
-                    id: crypto.randomUUID(),
-                    text: message,
-                    isUserMessage: true,
-                  },
-                ],
-                hasMore: false,
-              },
-            ],
-            pageParams: [1],
+            ...old,
+            pages: newPages,
           };
         }
-
-        const newPages = [...old.pages];
-        const latestPage = newPages[0]!;
-
-        latestPage.messages = [
-          {
-            createdAt: new Date().toISOString(),
-            id: crypto.randomUUID(),
-            text: message,
-            isUserMessage: true,
-          },
-          ...latestPage.messages,
-        ];
-
-        newPages[0] = latestPage;
-
-        return {
-          ...old,
-          pages: newPages,
-        };
-      });
+      );
 
       setIsLoading(true);
 
@@ -168,16 +188,16 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
           // append chunk to the actual message
           queryClient.setQueryData(
             ["messages", fileId.toString()],
-            (old: any) => {
+            (old: QueryData | undefined) => {
               if (!old) return { pages: [], pageParams: [] };
 
-              const isAiResponseCreated = old.pages.some((page: any) =>
+              const isAiResponseCreated = old.pages.some((page: PageData) =>
                 page.messages.some(
-                  (message: any) => message.id === "ai-response"
+                  (message: MessageData) => message.id === "ai-response"
                 )
               );
 
-              const updatedPages = old.pages.map((page: any) => {
+              const updatedPages = old.pages.map((page: PageData) => {
                 if (page === old.pages[0]) {
                   let updatedMessages;
 
@@ -192,15 +212,17 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
                       ...page.messages,
                     ];
                   } else {
-                    updatedMessages = page.messages.map((message: any) => {
-                      if (message.id === "ai-response") {
-                        return {
-                          ...message,
-                          text: accResponse,
-                        };
+                    updatedMessages = page.messages.map(
+                      (message: MessageData) => {
+                        if (message.id === "ai-response") {
+                          return {
+                            ...message,
+                            text: accResponse,
+                          };
+                        }
+                        return message;
                       }
-                      return message;
-                    });
+                    );
                   }
 
                   return {

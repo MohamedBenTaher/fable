@@ -7,7 +7,7 @@ export const getMessagesByFileUser = async (
   userId: string,
   limit: number = 10,
   page: number = 1,
-  conversationId?: number
+  conversationId?: number | null
 ) => {
   const offset = (page - 1) * limit;
 
@@ -49,7 +49,7 @@ export const createMessage = async (
   fileId: string,
   message: string,
   isUserMessage: boolean,
-  conversationId?: number
+  conversationId?: number | null
 ): Promise<Message> => {
   const [newMessage] = await db
     .insert(messages)

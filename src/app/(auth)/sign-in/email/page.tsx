@@ -30,7 +30,7 @@ const registrationSchema = z.object({
 export default function SignInPage() {
   const { toast } = useToast();
 
-  const { execute, isPending, error, reset } = useServerAction(signInAction, {
+  const { execute, isPending, error } = useServerAction(signInAction, {
     onError({ err }) {
       toast({
         title: "Something went wrong",

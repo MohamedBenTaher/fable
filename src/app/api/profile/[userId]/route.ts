@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
-import {
-  getProfile,
-  createProfile,
-  updateProfile,
-} from "@/data-access/profiles";
+import { getProfile, updateProfile } from "@/data-access/profiles";
 
 export async function GET(
   req: NextRequest,
@@ -56,9 +52,7 @@ export async function POST(
       return new NextResponse("Forbidden", { status: 403 });
     }
 
-    const { displayName, country, bio } = await req.json();
-
-    const profile = await createProfile(userId, displayName, undefined);
+    const { country, bio } = await req.json();
 
     if (country || bio) {
       await updateProfile(userId, { country, bio });

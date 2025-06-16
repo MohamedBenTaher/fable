@@ -11,7 +11,7 @@ export async function sendEmail(
   body: ReactNode
 ) {
   const { error } = await resend.emails.send({
-    from: env.EMAIL_FROM,
+    from: env.EMAIL_FROM ?? (() => { throw new Error("EMAIL_FROM is not defined"); })(),
     to: email,
     subject,
     react: <>{body}</>,

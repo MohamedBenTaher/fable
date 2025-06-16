@@ -3,9 +3,27 @@
 import { useEffect } from "react";
 import { env } from "@/env";
 
+interface PaddleEvent {
+  name: string;
+  data?: Record<string, unknown>;
+}
+
+interface PaddleSDK {
+  Environment: {
+    set: (environment: string) => Promise<void>;
+  };
+  Initialize: (config: {
+    token: string;
+    eventCallback: (data: PaddleEvent) => void;
+  }) => Promise<void>;
+  Checkout: {
+    open: (options: Record<string, unknown>) => Promise<void>;
+  };
+}
+
 declare global {
   interface Window {
-    Paddle: any;
+    Paddle: PaddleSDK;
   }
 }
 
@@ -52,7 +70,7 @@ export function PaddleProvider({ children }: { children: React.ReactNode }) {
               token:
                 env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ||
                 env.NEXT_PUBLIC_PADDLE_VENDOR_ID,
-              eventCallback: (data: any) => {
+              eventCallback: (data: PaddleEvent) => {
                 console.log("Paddle event:", data);
               },
             });

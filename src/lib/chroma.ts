@@ -1,6 +1,6 @@
 import { ChromaClient } from "chromadb";
 
-let chromaClient: any = null;
+let chromaClient: ChromaClient | null = null;
 
 export async function getChromaClient() {
   if (!chromaClient) {
@@ -26,8 +26,16 @@ export async function getOrCreateCollection(name: string) {
   console.log(`Getting or creating collection: ${name}`);
 
   try {
+    // Provide a dummy embeddingFunction or your actual implementation
     const collection = await client.getCollection({
       name,
+      embeddingFunction: {
+        generate: async (texts: string[]) => {
+          // Replace this with your actual embedding logic
+          return texts.map(() => Array(768).fill(0));
+        },
+        // Optionally, you can add other methods required by IEmbeddingFunction
+      },
     });
     console.log(`Collection ${name} retrieved successfully`);
 

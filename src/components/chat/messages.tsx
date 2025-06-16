@@ -134,8 +134,8 @@ export function Messages({ fileId }: MessagesProps) {
               Start a conversation
             </h3>
             <p className="text-gray-500 text-sm max-w-sm">
-              Ask questions about your document. I'll help you understand and
-              analyze the content.
+              Ask questions about your document. I&apos;ll help you understand
+              and analyze the content.
             </p>
           </div>
         )}

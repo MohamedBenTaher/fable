@@ -6,9 +6,6 @@ import { ConversationList } from "./conversation-list";
 import { ChevronLeft, Loader2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
-import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { getCurrentUserAction } from "@/lib/session-actions";
 import { File } from "@/db/schema";
 
 interface ChatWrapperProps {
@@ -17,26 +14,8 @@ interface ChatWrapperProps {
 }
 
 const ChatWrapper = ({ file, isSubscribed }: ChatWrapperProps) => {
-  const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    getCurrentUserAction()
-      .then(setUser)
-      .catch((error) => {
-        console.error("Failed to fetch user:", error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch user information.",
-          variant: "destructive",
-        });
-      });
-    // No return statement here
-  }, []);
-
-  // Show loading if file is not provided or still processing
-  const isLoading = !file || file.status === "processing";
   console.log("file", file);
+
   if (!file || file.status === "pending")
     return (
       <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">

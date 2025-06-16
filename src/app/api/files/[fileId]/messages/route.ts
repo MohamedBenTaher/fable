@@ -8,6 +8,7 @@ import { createMessage, getMessagesByFileUser } from "@/data-access/messages";
 import { createConversation } from "@/data-access/conversations";
 import { getOrCreateCollection } from "@/lib/chroma";
 import { getEmbeddings } from "@/lib/embeddings";
+import { IncludeEnum } from "chromadb";
 
 export const POST = async (
   req: NextRequest,
@@ -83,7 +84,11 @@ export const POST = async (
         const results = await collection.query({
           queryEmbeddings: [embeddingArray],
           nResults: Math.min(4, count),
-          include: ["documents", "metadatas", "distances"],
+          include: [
+            IncludeEnum.Documents,
+            IncludeEnum.Metadatas,
+            IncludeEnum.Distances,
+          ],
         });
 
         console.log(
@@ -98,8 +103,8 @@ export const POST = async (
           results.documents[0].length > 0
         ) {
           const documentsWithDistance = results.documents[0].map(
-            (doc: string, index: number) => ({
-              document: doc,
+            (doc: string | null, index: number) => ({
+              document: doc ?? "",
               distance: results.distances?.[0]?.[index] || 1,
               metadata: results.metadatas?.[0]?.[index],
             })

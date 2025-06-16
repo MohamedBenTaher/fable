@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, Star, Zap, Crown, ArrowRight } from "lucide-react";
+import { Check, Star, Crown, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -73,6 +73,14 @@ const pricingTiers = [
   },
 ];
 
+interface PaddleEvent {
+  name: string;
+  data?: Record<string, unknown>;
+}
+
+// Remove this block if a similar Window interface augmentation exists elsewhere in your codebase (e.g., in paddle-provider.tsx).
+// Only one augmentation of Window with Paddle: PaddleSDK should exist in your project.
+
 export default function PricingPage() {
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
@@ -119,7 +127,7 @@ export default function PricingPage() {
                 token:
                   env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ||
                   env.NEXT_PUBLIC_PADDLE_VENDOR_ID,
-                eventCallback: (data: any) => {
+                eventCallback: (data: PaddleEvent) => {
                   console.log("Paddle event:", data);
                   if (data.name === "checkout.completed") {
                     toast({
@@ -382,7 +390,9 @@ export default function PricingPage() {
 
                 {/* CTA Button */}
                 <Button
-                  onClick={() => handleSubscribe(tier.priceId, tier.name)}
+                  onClick={() =>
+                    handleSubscribe(tier.priceId ?? null, tier.name)
+                  }
                   disabled={isLoading === tier.priceId}
                   className={cn(
                     "w-full py-3 rounded-lg font-semibold transition-all duration-200",
@@ -431,7 +441,7 @@ export default function PricingPage() {
               </h3>
               <p className="text-gray-600 text-sm">
                 Yes, you can change your plan at any time. Changes take effect
-                immediately and we'll prorate your billing accordingly.
+                immediately and we&apos;ll prorate your billing accordingly.
               </p>
             </div>
 
@@ -450,8 +460,8 @@ export default function PricingPage() {
                 Is there a free trial?
               </h3>
               <p className="text-gray-600 text-sm">
-                Our Free plan lets you explore Fable's core features. Pro and
-                Enterprise plans come with a 14-day money-back guarantee.
+                Our Free plan lets you explore Fable&apos;s core features. Pro
+                and Enterprise plans come with a 14-day money-back guarantee.
               </p>
             </div>
 

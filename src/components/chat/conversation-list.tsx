@@ -6,6 +6,12 @@ import { MessageSquare, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 
+interface Conversation {
+  id: number;
+  title: string;
+  updated_at: string;
+}
+
 interface ConversationListProps {
   fileId: string;
   currentConversationId: number | null;
@@ -13,13 +19,12 @@ interface ConversationListProps {
 }
 
 export function ConversationList({
-  fileId,
   currentConversationId,
   onConversationSelect,
 }: ConversationListProps) {
   const { data: conversations, isLoading } = useQuery({
     queryKey: ["conversations"],
-    queryFn: async () => {
+    queryFn: async (): Promise<Conversation[]> => {
       const response = await fetch("/api/conversations");
       return response.json();
     },
@@ -68,7 +73,7 @@ export function ConversationList({
 
         {/* Conversations List */}
         <div className="space-y-1 max-h-64 overflow-y-auto">
-          {conversations?.map((conversation: any) => (
+          {conversations?.map((conversation: Conversation) => (
             <div
               key={conversation.id}
               className={cn(

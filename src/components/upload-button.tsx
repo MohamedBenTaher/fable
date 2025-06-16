@@ -5,14 +5,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Button } from "./ui/button";
 import { useDropzone } from "react-dropzone";
-import { Cloud, File, Loader2, Upload, X, CheckCircle } from "lucide-react";
+import { File, Loader2, Upload, CheckCircle } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const UploadDropZone = ({ user }: { user: any }) => {
+interface User {
+  id: number;
+  email: string;
+}
+
+const UploadDropZone = ({ user }: { user: User }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState<string>("");
@@ -211,7 +216,7 @@ const UploadDropZone = ({ user }: { user: any }) => {
   );
 };
 
-function UploadButton({ user }: { user: any }) {
+function UploadButton({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
 
   return (
