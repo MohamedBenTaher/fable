@@ -7,15 +7,14 @@ import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query";
 import Message from "./message";
 import Skeleton from "react-loading-skeleton";
 
-// import { getCurrentUser } from "@/lib/session";
-
 interface MessagesProps {
   fileId: string;
 }
 
 export function Messages({ fileId }: MessagesProps) {
   const { isLoading: isAiThinking } = useContext(ChatContext);
-  const user = {};
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
   const { data, fetchNextPage, isLoading, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["messages", fileId],
@@ -54,13 +53,22 @@ export function Messages({ fileId }: MessagesProps) {
     ...messages,
   ];
 
-  const lastMessageRef = useRef<HTMLDivElement>(null);
-
-  const { ref, entry } = useIntersection({
-    root: lastMessageRef.current,
+  const { ref: intersectionRef, entry } = useIntersection({
+    root: scrollAreaRef.current,
     threshold: 1,
   });
 
+  // Auto-scroll to bottom when new messages arrive or AI is thinking
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  }, [combinedMessages.length, isAiThinking]);
+
+  // Load more messages when scrolling to top
   useEffect(() => {
     if (entry?.isIntersecting && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
@@ -68,35 +76,49 @@ export function Messages({ fileId }: MessagesProps) {
   }, [entry, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <div className="min-h-full flex flex-col">
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-0">
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Messages Container - Scrollable */}
+      <div
+        ref={scrollAreaRef}
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-0 scroll-smooth"
+        style={{
+          scrollBehavior: "smooth",
+        }}
+      >
         {combinedMessages && combinedMessages.length > 0 ? (
-          <div className="flex flex-col-reverse space-y-reverse space-y-4">
-            {combinedMessages.map((message, i) => {
-              const isNextMessageSamePerson =
-                combinedMessages[i - 1]?.isUserMessage ===
-                combinedMessages[i]?.isUserMessage;
+          <>
+            {/* Load More Indicator at Top */}
+            {isFetchingNextPage && (
+              <div className="flex justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+              </div>
+            )}
 
-              if (i === combinedMessages.length - 1) {
-                return (
-                  <Message
-                    ref={ref}
-                    message={message}
-                    isNextMessageSamePerson={isNextMessageSamePerson}
-                    key={message?.id}
-                  />
-                );
-              } else
-                return (
-                  <Message
-                    message={message}
-                    isNextMessageSamePerson={isNextMessageSamePerson}
-                    key={message?.id}
-                  />
-                );
-            })}
-          </div>
+            {/* Intersection observer ref for loading more */}
+            {hasNextPage && <div ref={intersectionRef} className="h-1" />}
+
+            {/* Messages */}
+            <div className="space-y-4">
+              {combinedMessages
+                .slice()
+                .reverse() // Reverse to show oldest first, newest last
+                .map((message, i, reversedArray) => {
+                  const isNextMessageSamePerson =
+                    reversedArray[i + 1]?.isUserMessage === message?.isUserMessage;
+
+                  return (
+                    <Message
+                      message={message}
+                      isNextMessageSamePerson={isNextMessageSamePerson}
+                      key={message?.id}
+                    />
+                  );
+                })}
+            </div>
+
+            {/* Bottom anchor for auto-scroll */}
+            <div ref={bottomRef} className="h-1" />
+          </>
         ) : isLoading ? (
           <div className="space-y-4">
             <Skeleton className="h-16" />
@@ -117,13 +139,6 @@ export function Messages({ fileId }: MessagesProps) {
           </div>
         )}
       </div>
-
-      {/* Load More Indicator */}
-      {isFetchingNextPage && (
-        <div className="flex justify-center py-4 border-t border-gray-100">
-          <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-        </div>
-      )}
     </div>
   );
 }

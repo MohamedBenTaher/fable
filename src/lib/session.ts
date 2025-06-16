@@ -5,13 +5,17 @@ import { validateRequest } from "@/lib/auth";
 import { cache } from "react";
 import { AuthenticationError } from "../use-cases/errors";
 import { UserId } from "@/use-cases/types";
+import { getUser } from "@/data-access/users";
 
 export const getCurrentUser = cache(async () => {
   const session = await validateRequest();
   if (!session.user) {
     return undefined;
   }
-  return session.user;
+
+  // Get the complete user data from the database
+  const fullUser = await getUser(session.user.id);
+  return fullUser;
 });
 
 export const assertAuthenticated = async () => {

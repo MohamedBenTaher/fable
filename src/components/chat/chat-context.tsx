@@ -9,6 +9,8 @@ type StreamResponse = {
   message: string;
   handleInputChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   isLoading: boolean;
+  currentConversationId: number | null;
+  setCurrentConversationId: (id: number | null) => void;
 };
 
 export const ChatContext = createContext<StreamResponse>({
@@ -16,6 +18,8 @@ export const ChatContext = createContext<StreamResponse>({
   message: "",
   handleInputChange: () => {},
   isLoading: false,
+  currentConversationId: null,
+  setCurrentConversationId: () => {},
 });
 
 interface Props {
@@ -26,6 +30,9 @@ interface Props {
 export const ChatContextProvider = ({ fileId, children }: Props) => {
   const [message, setMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [currentConversationId, setCurrentConversationId] = useState<
+    number | null
+  >(null);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -41,6 +48,7 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
         body: JSON.stringify({
           fileId: fileId.toString(),
           message,
+          conversationId: currentConversationId,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +60,9 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`API Error: ${response.status} - ${errorText}`);
-        throw new Error(`Failed to send message: ${response.status} ${errorText}`);
+        throw new Error(
+          `Failed to send message: ${response.status} ${errorText}`
+        );
       }
 
       return response.body;
@@ -133,8 +143,6 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
       const reader = stream.getReader();
       const decoder = new TextDecoder();
       let done = false;
-
-      // accumulated response
       let accResponse = "";
 
       try {
@@ -143,7 +151,18 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
           done = doneReading;
           const chunkValue = decoder.decode(value);
 
-          accResponse += chunkValue;
+          try {
+            // Try to parse as JSON to get conversation ID
+            const parsedChunk = JSON.parse(chunkValue);
+            if (parsedChunk.conversationId && !currentConversationId) {
+              setCurrentConversationId(parsedChunk.conversationId);
+            }
+            accResponse += parsedChunk.content || chunkValue;
+          } catch {
+            // If not JSON, treat as plain text
+            accResponse += chunkValue;
+          }
+
           console.log(`Received chunk: ${chunkValue}`);
 
           // append chunk to the actual message
@@ -153,7 +172,9 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
               if (!old) return { pages: [], pageParams: [] };
 
               const isAiResponseCreated = old.pages.some((page: any) =>
-                page.messages.some((message: any) => message.id === "ai-response")
+                page.messages.some(
+                  (message: any) => message.id === "ai-response"
+                )
               );
 
               const updatedPages = old.pages.map((page: any) => {
@@ -249,6 +270,8 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
         message,
         handleInputChange,
         isLoading,
+        currentConversationId,
+        setCurrentConversationId,
       }}
     >
       {children}

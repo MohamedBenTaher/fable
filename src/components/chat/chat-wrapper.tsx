@@ -2,6 +2,7 @@
 
 import ChatInput from "@/components/chat/chat-input";
 import Messages from "@/components/chat/messages";
+import { ConversationList } from "./conversation-list";
 import { ChevronLeft, Loader2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
@@ -98,6 +99,13 @@ const ChatWrapper = ({ file, isSubscribed }: ChatWrapperProps) => {
 
   return (
     <div className="h-full flex flex-col bg-white">
+      {/* Conversation List */}
+      <ConversationList
+        fileId={file.id.toString()}
+        currentConversationId={null} // This will be managed by ChatContext
+        onConversationSelect={() => {}} // This will be implemented
+      />
+
       {/* Chat Header */}
       <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200 bg-white">
         <h2 className="text-lg font-semibold text-gray-900 truncate">
@@ -108,8 +116,8 @@ const ChatWrapper = ({ file, isSubscribed }: ChatWrapperProps) => {
         </p>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-hidden min-h-0">
+      {/* Messages Area - Fixed height with proper overflow */}
+      <div className="flex-1 min-h-0 overflow-hidden">
         <Messages fileId={file.id.toString()} />
       </div>
 

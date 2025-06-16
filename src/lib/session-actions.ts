@@ -3,5 +3,11 @@
 import { getCurrentUser } from "@/lib/session";
 
 export async function getCurrentUserAction() {
-  return await getCurrentUser();
+  try {
+    const user = await getCurrentUser();
+    return user;
+  } catch (error) {
+    console.error("Error getting current user:", error);
+    return null;
+  }
 }

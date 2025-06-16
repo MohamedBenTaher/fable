@@ -8,6 +8,8 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const accountTypeEnum = ["email", "google", "github"] as const;
+export const userTypeEnum = ["free", "premium"] as const;
+
 export enum UploadStatus {
   Pending = "pending",
   Processing = "processing",
@@ -33,6 +35,7 @@ export const users = pgTable("user", {
   role: text("role").$default(() => "user"),
   email: text("email").unique().notNull(),
   emailVerified: timestamp("email_verified"),
+  userType: text("user_type", { enum: userTypeEnum }).notNull().default("free"),
 });
 
 export const accounts = pgTable("accounts", {
@@ -116,6 +119,17 @@ export const files = pgTable("files", {
   uploadedAt: timestamp("uploaded_at").notNull(),
 });
 
+export const conversations = pgTable("conversations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull().default(""),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+  isArchived: boolean("is_archived").notNull().default(false),
+});
 export const messages = pgTable("messages", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
@@ -124,6 +138,10 @@ export const messages = pgTable("messages", {
   isUserMessage: boolean("is_user_message").notNull(),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
+  conversationId: integer("conversation_id").references(
+    () => conversations.id,
+    { onDelete: "cascade" }
+  ),
 });
 
 export type User = typeof users.$inferSelect;
@@ -135,4 +153,5 @@ export type Message = typeof messages.$inferSelect;
 export type VerifyEmailToken = typeof verifyEmailTokens.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 export type File = typeof files.$inferSelect;
+export type Conversation = typeof conversations.$inferSelect;
 export type UploadStatusType = UploadStatus;

@@ -5,6 +5,7 @@ import { fetchGroqResponse } from "@/lib/groq";
 import { StreamingTextResponse } from "ai";
 import { getFile } from "@/data-access/files";
 import { createMessage, getMessagesByFileUser } from "@/data-access/messages";
+import { createConversation } from "@/data-access/conversations";
 import { getOrCreateCollection } from "@/lib/chroma";
 import { getEmbeddings } from "@/lib/embeddings";
 
@@ -22,7 +23,7 @@ export const POST = async (
 
     const { id: userId } = user;
     const { fileId } = params;
-    const { message } = SendMessageValidator.parse(body);
+    const { message, conversationId } = SendMessageValidator.parse(body);
 
     console.log(`Processing message for file ${fileId}: "${message}"`);
 
@@ -31,7 +32,29 @@ export const POST = async (
       return new Response("Not found", { status: 404 });
     }
 
-    await createMessage(userId.toString(), fileId, message, true);
+    let currentConversationId = conversationId;
+
+    // Create a new conversation if none exists
+    if (!currentConversationId) {
+      // Generate conversation title from first message (truncate if too long)
+      const conversationTitle =
+        message.length > 50 ? message.substring(0, 47) + "..." : message;
+
+      const conversation = await createConversation(
+        userId,
+        conversationTitle,
+        `Conversation about ${file.fileName}`
+      );
+      currentConversationId = conversation.id;
+    }
+
+    await createMessage(
+      userId.toString(),
+      fileId,
+      message,
+      true,
+      currentConversationId
+    );
 
     let context = "";
     let groqResponse =
@@ -118,11 +141,13 @@ export const POST = async (
         "I'm having trouble searching the document content. I'll try to answer based on general knowledge.";
     }
 
-    // Get previous messages
+    // Get previous messages from this conversation
     const prevMessages = await getMessagesByFileUser(
       fileId,
       userId.toString(),
-      5
+      5,
+      1,
+      currentConversationId
     );
 
     const formattedPrevMessages = prevMessages.messages.map((msg) => ({
@@ -165,14 +190,24 @@ Instructions:
         "I'm sorry, but I'm experiencing technical difficulties. Please try again later.";
     }
 
-    // Store LLM response
-    await createMessage(userId.toString(), fileId, groqResponse, false);
+    // Store LLM response with conversation ID
+    await createMessage(
+      userId.toString(),
+      fileId,
+      groqResponse,
+      false,
+      currentConversationId
+    );
 
-    // Create streaming response
+    // Create streaming response with conversation ID
     const stream = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder();
-        controller.enqueue(encoder.encode(groqResponse));
+        const responseData = JSON.stringify({
+          content: groqResponse,
+          conversationId: currentConversationId,
+        });
+        controller.enqueue(encoder.encode(responseData));
         controller.close();
       },
     });
@@ -200,8 +235,10 @@ export const GET = async (
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const conversationId = searchParams.get("conversationId")
+      ? parseInt(searchParams.get("conversationId")!, 10)
+      : undefined;
 
-    // Convert fileId string to number for getFile function
     const file = await getFile(Number(fileId), userId);
 
     if (!file) {
@@ -212,7 +249,8 @@ export const GET = async (
       fileId,
       userId.toString(),
       limit,
-      page
+      page,
+      conversationId
     );
 
     return new NextResponse(JSON.stringify(messages), { status: 200 });
