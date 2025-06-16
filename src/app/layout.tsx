@@ -5,6 +5,7 @@ import Navbar from "@/components/nabvar";
 import Providers from "@/components/providers";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Toaster } from "@/components/ui/toaster";
+import { PaddleProvider } from "@/components/paddle-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,11 +33,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen font-sans antialiased grainy`}
       >
-        <Providers>
-          <Navbar />
-          {children}
-        </Providers>
-        <Toaster />
+        <PaddleProvider>
+          <Providers>
+            <Navbar />
+            {children}
+            <Toaster />
+          </Providers>
+        </PaddleProvider>
       </body>
     </html>
   );

@@ -145,7 +145,7 @@ function Navbar() {
                 <>
                   <Link
                     className={buttonVariants({ size: "sm", variant: "ghost" })}
-                    href="/dashboard"
+                    href="/pricing"
                   >
                     Pricing
                   </Link>
@@ -157,7 +157,7 @@ function Navbar() {
                   </Link>
                   <Link
                     className={buttonVariants({ size: "sm" })}
-                    href="/sign-up"
+                    href="/pricing"
                   >
                     Get started
                     <ArrowRight className="ml-1.5 h-5 w-5" />

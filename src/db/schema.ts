@@ -143,6 +143,22 @@ export const messages = pgTable("messages", {
     { onDelete: "cascade" }
   ),
 });
+export const subscriptions = pgTable("subscriptions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .unique()
+    .notNull(),
+  paddleSubscriptionId: text("paddle_subscription_id").unique().notNull(),
+  status: text("status").notNull(), // active, canceled, past_due, etc.
+  planName: text("plan_name").notNull(), // pro, enterprise
+  priceId: text("price_id").notNull(),
+  currentPeriodStart: timestamp("current_period_start").notNull(),
+  currentPeriodEnd: timestamp("current_period_end").notNull(),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
 
 export type User = typeof users.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
@@ -155,3 +171,4 @@ export type Session = typeof sessions.$inferSelect;
 export type File = typeof files.$inferSelect;
 export type Conversation = typeof conversations.$inferSelect;
 export type UploadStatusType = UploadStatus;
+export type Subscription = typeof subscriptions.$inferSelect;

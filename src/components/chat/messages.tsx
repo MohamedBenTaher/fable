@@ -104,7 +104,8 @@ export function Messages({ fileId }: MessagesProps) {
                 .reverse() // Reverse to show oldest first, newest last
                 .map((message, i, reversedArray) => {
                   const isNextMessageSamePerson =
-                    reversedArray[i + 1]?.isUserMessage === message?.isUserMessage;
+                    reversedArray[i + 1]?.isUserMessage ===
+                    message?.isUserMessage;
 
                   return (
                     <Message

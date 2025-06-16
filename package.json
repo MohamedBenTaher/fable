@@ -25,6 +25,7 @@
     "@lucia-auth/adapter-drizzle": "^1.1.0",
     "@mantine/core": "^7.13.5",
     "@mantine/hooks": "^7.13.5",
+    "@paddle/paddle-js": "^1.4.1",
     "@pinecone-database/pinecone": "^4.0.0",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",
