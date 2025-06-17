@@ -245,14 +245,14 @@ export default async function Home() {
               },
               {
                 quote:
-                  "The AI conversations feature is incredible. It's like having a research assistant that never sleeps.",
+                  "The AI conversations feature is incredible. It&quot;s like having a research assistant that never sleeps.",
                 author: "Marcus Rodriguez",
                 role: "Legal Analyst",
                 avatar: "MR",
               },
               {
                 quote:
-                  "My team's productivity increased by 3x since we started using Fable for document analysis.",
+                  "My team&quot;s productivity increased by 3x since we started using Fable for document analysis.",
                 author: "Emily Johnson",
                 role: "Product Manager",
                 avatar: "EJ",
@@ -262,7 +262,7 @@ export default async function Home() {
                 <CardContent className="p-8">
                   <Quote className="h-8 w-8 text-blue-600 mb-4" />
                   <p className="text-gray-700 mb-6 leading-relaxed">
-                    "{testimonial.quote}"
+                    &quot;{testimonial.quote}&quot;
                   </p>
                   <div className="flex items-center space-x-3">
                     <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold">
@@ -459,7 +459,7 @@ export default async function Home() {
             </h2>
             <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
               Join thousands of professionals who are already saving hours every
-              day with Fable's AI-powered document analysis.
+              day with Fable&quot;s AI-powered document analysis.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">

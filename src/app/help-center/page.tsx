@@ -1,6 +1,5 @@
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   Search,
@@ -241,8 +240,8 @@ export default function HelpCenterPage() {
             <CardContent>
               <p className="text-gray-600">
                 Fable supports PDF files, Word documents (.docx), PowerPoint
-                presentations (.pptx), and text files (.txt). We're continuously
-                adding support for more formats.
+                presentations (.pptx), and text files (.txt). We&apos;re
+                continuously adding support for more formats.
               </p>
             </CardContent>
           </Card>

@@ -24,10 +24,10 @@ export default function TermsOfServicePage() {
               Agreement to Terms
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              By accessing and using Fable's AI-powered document analysis
+              By accessing and using Fable&apos;s AI-powered document analysis
               service, you agree to be bound by these Terms of Service
-              ("Terms"). If you do not agree to these Terms, please do not use
-              our service.
+              (&quot;Terms&quot;). If you do not agree to these Terms, please do
+              not use our service.
             </p>
           </section>
 
@@ -176,7 +176,7 @@ export default function TermsOfServicePage() {
               </li>
               <li>All fees are non-refundable except as required by law</li>
               <li>
-                We may change pricing with 30 days' notice to existing
+                We may change pricing with 30 days&apos; notice to existing
                 subscribers
               </li>
               <li>
@@ -277,7 +277,8 @@ export default function TermsOfServicePage() {
             </h3>
             <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
               <li>
-                Our service is provided "as is" without warranties of any kind
+                Our service is provided &quot;as is&quot; without warranties of
+                any kind
               </li>
               <li>AI responses may contain errors or inaccuracies</li>
               <li>
