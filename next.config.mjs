@@ -5,18 +5,20 @@ const nextConfig = {
     config.resolve.alias.canvas = false;
     config.resolve.alias.encoding = false;
 
-    // Externalize ChromaDB and related dependencies for server-side
+    // Externalize heavy dependencies completely
     if (isServer) {
       config.externals = config.externals || [];
       config.externals.push({
-        chromadb: "commonjs chromadb",
-        "onnxruntime-node": "commonjs onnxruntime-node",
-        "@huggingface/transformers": "commonjs @huggingface/transformers",
-        "@google/generative-ai": "commonjs @google/generative-ai",
+        chromadb: "chromadb",
+        "onnxruntime-node": "onnxruntime-node",
+        "@huggingface/transformers": "@huggingface/transformers",
+        "@google/generative-ai": "@google/generative-ai",
+        "pdf-parse": "pdf-parse",
+        sharp: "sharp",
       });
     }
 
-    // Ignore specific binary files that cause webpack issues
+    // Ignore binary files
     config.module = config.module || {};
     config.module.rules = config.module.rules || [];
     config.module.rules.push({
@@ -24,30 +26,20 @@ const nextConfig = {
       use: "ignore-loader",
     });
 
-    // Add rule to handle HTTPS URLs in ChromaDB
-    config.module.rules.push({
-      test: /chromadb/,
-      resolve: {
-        fallback: {
-          https: false,
-          http: false,
-          url: false,
-        },
-      },
-    });
-
     return config;
   },
   experimental: {
-    // Disable static optimization for API routes that use ChromaDB
     serverComponentsExternalPackages: [
       "chromadb",
       "@huggingface/transformers",
-      "uploadthing",
+      "onnxruntime-node",
       "pdf-parse",
       "@google/generative-ai",
+      "sharp",
     ],
   },
+  // Add output configuration
+  output: "standalone",
 };
 
 export default nextConfig;
