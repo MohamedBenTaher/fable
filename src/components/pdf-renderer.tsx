@@ -32,6 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+// @ts-ignore - simplebar-react has type resolution issues with package.json exports
 import SimpleBar from "simplebar-react";
 import PdfFullscreen from "./pdf-full-screen";
 
