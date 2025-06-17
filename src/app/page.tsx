@@ -7,9 +7,6 @@ import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-  const user = await getCurrentUser();
-  if (!user) redirect("/sign-in");
-
   return (
     <>
       <MaxWidthWrapper className="mb-12 mt-28 sm:mt-40 flex flex-col items-center justify-center text-center">
