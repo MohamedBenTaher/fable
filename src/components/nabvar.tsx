@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import MaxWidthWrapper from "./max-width-wrapper";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
-import { ArrowRight, LogOut, User } from "lucide-react";
+import { ArrowRight, LogOut, User, HelpCircle } from "lucide-react";
 import { getCurrentUserAction } from "@/lib/session-actions";
 import {
   DropdownMenu,
@@ -28,18 +28,31 @@ function Navbar() {
 
   useEffect(() => {
     getCurrentUserAction()
-      .then((userData: { id: number; role: string | null; email: string; emailVerified: Date | null; userType: "free" | "premium"; } | null | undefined) => {
-        console.log("userData", userData);
-        if (
-          userData &&
-          typeof userData.id === "number" &&
-          typeof userData.email === "string"
-        ) {
-          setUser({ id: userData.id, email: userData.email });
-        } else {
-          setUser(null);
+      .then(
+        (
+          userData:
+            | {
+                id: number;
+                role: string | null;
+                email: string;
+                emailVerified: Date | null;
+                userType: "free" | "premium";
+              }
+            | null
+            | undefined
+        ) => {
+          console.log("userData", userData);
+          if (
+            userData &&
+            typeof userData.id === "number" &&
+            typeof userData.email === "string"
+          ) {
+            setUser({ id: userData.id, email: userData.email });
+          } else {
+            setUser(null);
+          }
         }
-      })
+      )
       .catch((error) => {
         console.error("Failed to fetch user:", error);
         setUser(null);
@@ -129,6 +142,12 @@ function Navbar() {
                           Profile
                         </Link>
                       </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/help-center" className="cursor-pointer">
+                          <HelpCircle className="mr-2 h-4 w-4" />
+                          Help Center
+                        </Link>
+                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         className="cursor-pointer text-red-600 focus:text-red-600"
@@ -148,6 +167,12 @@ function Navbar() {
                     href="/pricing"
                   >
                     Pricing
+                  </Link>
+                  <Link
+                    className={buttonVariants({ size: "sm", variant: "ghost" })}
+                    href="/help-center"
+                  >
+                    Help Center
                   </Link>
                   <Link
                     className={buttonVariants({ size: "sm", variant: "ghost" })}

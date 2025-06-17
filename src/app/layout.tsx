@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/nabvar";
+import Footer from "@/components/footer";
 import Providers from "@/components/providers";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -37,6 +38,7 @@ export default function RootLayout({
           <Providers>
             <Navbar />
             {children}
+            <Footer />
             <Toaster />
           </Providers>
         </PaddleProvider>
