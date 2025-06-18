@@ -43,7 +43,7 @@ export function Messages({ fileId }: MessagesProps) {
     isUserMessage: false,
     text: (
       <span className="flex h-full items-center justify-center">
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400" />
       </span>
     ),
   };
@@ -76,7 +76,7 @@ export function Messages({ fileId }: MessagesProps) {
   }, [entry, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden bg-gray-50 dark:bg-gray-950 transition-colors">
       {/* Messages Container - Scrollable */}
       <div
         ref={scrollAreaRef}
@@ -90,7 +90,7 @@ export function Messages({ fileId }: MessagesProps) {
             {/* Load More Indicator at Top */}
             {isFetchingNextPage && (
               <div className="flex justify-center py-4">
-                <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                <Loader2 className="h-5 w-5 animate-spin text-gray-400 dark:text-gray-600" />
               </div>
             )}
 
@@ -122,21 +122,27 @@ export function Messages({ fileId }: MessagesProps) {
           </>
         ) : isLoading ? (
           <div className="space-y-4">
-            <Skeleton className="h-16" />
-            <Skeleton className="h-16" />
-            <Skeleton className="h-16" />
-            <Skeleton className="h-16" />
+            <Skeleton className="h-16 bg-gray-200 dark:bg-gray-800" />
+            <Skeleton className="h-16 bg-gray-200 dark:bg-gray-800" />
+            <Skeleton className="h-16 bg-gray-200 dark:bg-gray-800" />
+            <Skeleton className="h-16 bg-gray-200 dark:bg-gray-800" />
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <MessageSquare className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="font-semibold text-xl text-gray-900 mb-2">
-              Start a conversation
-            </h3>
-            <p className="text-gray-500 text-sm max-w-sm">
-              Ask questions about your document. I&apos;ll help you understand
-              and analyze the content.
-            </p>
+          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700 max-w-md mx-auto transition-colors">
+              <MessageSquare className="h-12 w-12 text-gray-400 dark:text-gray-600 mb-4 mx-auto" />
+              <h3 className="font-semibold text-xl text-gray-900 dark:text-gray-100 mb-2">
+                Start a conversation
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                Ask questions about your document. I&apos;ll help you understand
+                and analyze the content with intelligent responses.
+              </p>
+              <div className="mt-4 text-xs text-gray-400 dark:text-gray-500">
+                💡 Try asking: "What is this document about?" or "Summarize the
+                key points"
+              </div>
+            </div>
           </div>
         )}
       </div>

@@ -254,20 +254,20 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-200">
+          <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800">
             <Star className="w-3 h-3 mr-1" />
             Simple, transparent pricing
           </Badge>
 
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent mb-6">
             Choose Your Plan
           </h1>
 
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
             Start free and scale as you grow. All plans include our core
             features with advanced capabilities in higher tiers.
           </p>
@@ -278,8 +278,8 @@ export default function PricingPage() {
               className={cn(
                 "text-sm",
                 billingCycle === "monthly"
-                  ? "text-gray-900 font-medium"
-                  : "text-gray-500"
+                  ? "text-gray-900 dark:text-gray-100 font-medium"
+                  : "text-gray-500 dark:text-gray-400"
               )}
             >
               Monthly
@@ -292,7 +292,9 @@ export default function PricingPage() {
               }
               className={cn(
                 "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                billingCycle === "yearly" ? "bg-blue-600" : "bg-gray-200"
+                billingCycle === "yearly"
+                  ? "bg-blue-600"
+                  : "bg-gray-200 dark:bg-gray-700"
               )}
             >
               <span
@@ -306,14 +308,14 @@ export default function PricingPage() {
               className={cn(
                 "text-sm",
                 billingCycle === "yearly"
-                  ? "text-gray-900 font-medium"
-                  : "text-gray-500"
+                  ? "text-gray-900 dark:text-gray-100 font-medium"
+                  : "text-gray-500 dark:text-gray-400"
               )}
             >
               Yearly
             </span>
             {billingCycle === "yearly" && (
-              <Badge className="ml-2 bg-green-100 text-green-700">
+              <Badge className="ml-2 bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
                 Save 20%
               </Badge>
             )}
@@ -326,7 +328,7 @@ export default function PricingPage() {
             <Card
               key={tier.name}
               className={cn(
-                "relative overflow-hidden transition-all duration-300 hover:shadow-2xl",
+                "relative overflow-hidden transition-all duration-300 hover:shadow-2xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800",
                 tier.popular
                   ? "ring-2 ring-blue-500 shadow-xl scale-105"
                   : "hover:shadow-lg"
@@ -344,30 +346,34 @@ export default function PricingPage() {
                   </Badge>
                 )}
 
-                <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
+                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                   {tier.name}
                 </CardTitle>
 
                 <div className="mb-4">
                   <div className="flex items-center justify-center">
-                    <span className="text-4xl font-bold text-gray-900">
+                    <span className="text-4xl font-bold text-gray-900 dark:text-gray-100">
                       ${tier.price === 0 ? 0 : getDiscountedPrice(tier.price)}
                     </span>
                     {tier.price > 0 && (
-                      <span className="text-gray-500 ml-2">
+                      <span className="text-gray-500 dark:text-gray-400 ml-2">
                         /{billingCycle === "monthly" ? "month" : "year"}
                       </span>
                     )}
                   </div>
                   {billingCycle === "yearly" && tier.price > 0 && (
-                    <div className="text-sm text-gray-500 mt-1">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       <span className="line-through">${tier.price}</span>
-                      <span className="text-green-600 ml-1">Save 20%</span>
+                      <span className="text-green-600 dark:text-green-400 ml-1">
+                        Save 20%
+                      </span>
                     </div>
                   )}
                 </div>
 
-                <p className="text-gray-600">{tier.description}</p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {tier.description}
+                </p>
               </CardHeader>
 
               <CardContent className="space-y-6">
@@ -383,7 +389,9 @@ export default function PricingPage() {
                       >
                         <Check className="w-3 h-3 text-white" />
                       </div>
-                      <span className="text-gray-700 text-sm">{feature}</span>
+                      <span className="text-gray-700 dark:text-gray-300 text-sm">
+                        {feature}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -399,8 +407,8 @@ export default function PricingPage() {
                     tier.popular
                       ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl"
                       : tier.name === "Enterprise"
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                      : "bg-white border-2 border-gray-200 text-gray-900 hover:border-gray-300 hover:bg-gray-50"
+                        ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                        : "bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600"
                   )}
                 >
                   {isLoading === tier.priceId ? (
@@ -419,7 +427,7 @@ export default function PricingPage() {
                 </Button>
 
                 {tier.name === "Free" && (
-                  <p className="text-xs text-gray-500 text-center mt-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
                     No credit card required
                   </p>
                 )}
@@ -430,46 +438,46 @@ export default function PricingPage() {
 
         {/* FAQ Section */}
         <div className="mt-24 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-12">
             Frequently Asked Questions
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto text-left">
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Can I upgrade or downgrade anytime?
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Yes, you can change your plan at any time. Changes take effect
                 immediately and we&apos;ll prorate your billing accordingly.
               </p>
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 What payment methods do you accept?
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 We accept all major credit cards, PayPal, and bank transfers for
                 enterprise customers.
               </p>
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Is there a free trial?
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Our Free plan lets you explore Fable&apos;s core features. Pro
                 and Enterprise plans come with a 14-day money-back guarantee.
               </p>
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Do you offer discounts for students or nonprofits?
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Yes! We offer special pricing for educational institutions and
                 nonprofits. Contact us for more information.
               </p>

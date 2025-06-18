@@ -3,7 +3,7 @@ import { Mail, Github, Twitter, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-gray-900 dark:bg-gray-950 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -12,7 +12,7 @@ export default function Footer() {
               <Link href="/" className="text-2xl font-bold">
                 Fable.
               </Link>
-              <p className="text-gray-400 mt-2">
+              <p className="text-gray-400 dark:text-gray-500 mt-2">
                 Transform your documents into intelligent conversations with
                 AI-powered analysis.
               </p>
@@ -20,28 +20,28 @@ export default function Footer() {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 aria-label="Twitter"
               >
                 <Twitter className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 aria-label="LinkedIn"
               >
                 <Linkedin className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 aria-label="GitHub"
               >
                 <Github className="h-5 w-5" />
               </a>
               <a
                 href="mailto:support@fable.com"
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 aria-label="Email"
               >
                 <Mail className="h-5 w-5" />
@@ -56,7 +56,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/dashboard"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   Dashboard
                 </Link>
@@ -64,7 +64,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/pricing"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   Pricing
                 </Link>
@@ -72,7 +72,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   Features
                 </Link>
@@ -80,7 +80,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   API Documentation
                 </Link>
@@ -95,7 +95,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/about"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   About Us
                 </Link>
@@ -103,7 +103,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   Blog
                 </Link>
@@ -111,7 +111,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   Careers
                 </Link>
@@ -119,7 +119,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   Contact
                 </Link>
@@ -134,7 +134,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/help-center"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   Help Center
                 </Link>
@@ -142,7 +142,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/privacy-policy"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   Privacy Policy
                 </Link>
@@ -150,7 +150,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/terms-of-service"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   Terms of Service
                 </Link>
@@ -158,7 +158,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/security"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                 >
                   Security
                 </Link>
@@ -168,18 +168,27 @@ export default function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <div className="text-gray-400 text-sm">
+        <div className="border-t border-gray-800 dark:border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <div className="text-gray-400 dark:text-gray-500 text-sm">
             © {new Date().getFullYear()} Fable. All rights reserved.
           </div>
-          <div className="flex space-x-6 text-sm text-gray-400 mt-4 md:mt-0">
-            <Link href="#" className="hover:text-white transition-colors">
+          <div className="flex space-x-6 text-sm text-gray-400 dark:text-gray-500 mt-4 md:mt-0">
+            <Link
+              href="#"
+              className="hover:text-white dark:hover:text-gray-300 transition-colors"
+            >
               Status
             </Link>
-            <Link href="#" className="hover:text-white transition-colors">
+            <Link
+              href="#"
+              className="hover:text-white dark:hover:text-gray-300 transition-colors"
+            >
               Changelog
             </Link>
-            <Link href="#" className="hover:text-white transition-colors">
+            <Link
+              href="#"
+              className="hover:text-white dark:hover:text-gray-300 transition-colors"
+            >
               Sitemap
             </Link>
           </div>

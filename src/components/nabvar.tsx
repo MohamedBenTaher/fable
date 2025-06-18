@@ -16,6 +16,7 @@ import {
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import ProfileCompletionBanner from "./profile-completion-banner";
+import { ThemeToggle } from "./theme-toggle";
 
 interface User {
   id: number;
@@ -82,19 +83,21 @@ function Navbar() {
       {user && <ProfileCompletionBanner />}
 
       {/* Main Navbar */}
-      <div className="sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-gray-200 bg-white/75 backdrop-blur-md transition-all">
+      <div className="sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-gray-200 dark:border-gray-800 bg-white/75 dark:bg-gray-900/75 backdrop-blur-md transition-all">
         <MaxWidthWrapper>
-          <div className="flex h-14 items-center justify-between border-b border-zinc-200">
+          <div className="flex h-14 items-center justify-between border-b border-zinc-200 dark:border-zinc-800">
             <Link href="/" className="flex z-40 font-semibold">
-              <span className="text-2xl text-gray-900">Fable.</span>
+              <span className="text-2xl text-gray-900 dark:text-white">
+                Fable.
+              </span>
             </Link>
 
             <div className="hidden items-center space-x-4 sm:flex">
               {isLoading ? (
                 // Loading skeleton
                 <div className="flex items-center space-x-4">
-                  <div className="h-8 w-16 bg-gray-200 animate-pulse rounded"></div>
-                  <div className="h-8 w-8 bg-gray-200 animate-pulse rounded-full"></div>
+                  <div className="h-8 w-16 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
+                  <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-full"></div>
                 </div>
               ) : user ? (
                 // Authenticated user menu
@@ -105,6 +108,8 @@ function Navbar() {
                   >
                     Dashboard
                   </Link>
+
+                  <ThemeToggle />
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -150,7 +155,7 @@ function Navbar() {
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
-                        className="cursor-pointer text-red-600 focus:text-red-600"
+                        className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
                         onClick={handleLogout}
                       >
                         <LogOut className="mr-2 h-4 w-4" />
@@ -174,6 +179,9 @@ function Navbar() {
                   >
                     Help Center
                   </Link>
+
+                  <ThemeToggle />
+
                   <Link
                     className={buttonVariants({ size: "sm", variant: "ghost" })}
                     href="/sign-in"

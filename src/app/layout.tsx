@@ -7,6 +7,7 @@ import Providers from "@/components/providers";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Toaster } from "@/components/ui/toaster";
 import { PaddleProvider } from "@/components/paddle-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,18 +31,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="light">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen font-sans antialiased grainy`}
       >
-        <PaddleProvider>
-          <Providers>
-            <Navbar />
-            {children}
-            <Footer />
-            <Toaster />
-          </Providers>
-        </PaddleProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <PaddleProvider>
+            <Providers>
+              <Navbar />
+              {children}
+              <Footer />
+              <Toaster />
+            </Providers>
+          </PaddleProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

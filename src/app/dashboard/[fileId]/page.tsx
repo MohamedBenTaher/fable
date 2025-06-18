@@ -23,17 +23,17 @@ async function Page({ params }: PageProps) {
   const file = await getFile(Number(fileId), user.id);
 
   return (
-    <div className="flex-1 justify-between flex flex-col h-[calc(100vh-3.5rem)]">
+    <div className="flex-1 justify-between flex flex-col h-[calc(100vh-3.5rem)] bg-gray-50 dark:bg-gray-950 transition-colors">
       <div className="mx-auto w-full max-w-8xl grow flex flex-col lg:flex-row xl:px-2 h-full">
         {/* Chat sidebar - responsive */}
-        <div className="flex-1 lg:flex-[0.5] xl:flex-[0.4] border-t border-gray-200 lg:border-l lg:border-t-0 h-full lg:h-auto">
+        <div className="flex-1 lg:flex-[0.6] xl:flex-[0.7] border-t border-gray-200 dark:border-gray-800 lg:border-l lg:border-t-0 h-full lg:h-auto">
           <ChatContextProvider fileId={file.id}>
             <ChatWrapper file={file} isSubscribed={false} />
           </ChatContextProvider>
         </div>
 
         {/* PDF renderer - responsive */}
-        <div className="flex-1 lg:flex-[0.5] xl:flex-[0.6] border-t lg:border-t border-gray-200 h-full lg:h-auto">
+        <div className="flex-1 lg:flex-[0.4] xl:flex-[0.3] border-t lg:border-t border-gray-200 dark:border-gray-800 h-full lg:h-auto">
           <div className="h-full">
             <PdfRenderer file={file} />
           </div>
