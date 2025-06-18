@@ -139,8 +139,8 @@ export function Messages({ fileId }: MessagesProps) {
                 and analyze the content with intelligent responses.
               </p>
               <div className="mt-4 text-xs text-gray-400 dark:text-gray-500">
-                💡 Try asking: "What is this document about?" or "Summarize the
-                key points"
+                💡 Try asking: &quot;What is this document about?&quot; or &quot;Summarize the
+                key points&quot;
               </div>
             </div>
           </div>
