@@ -512,7 +512,7 @@ export default async function Home() {
                 className={buttonVariants({
                   size: "lg",
                   className:
-                    "bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all",
+                    "bg-blue-600 text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all",
                 })}
               >
                 Start for free today
@@ -524,7 +524,7 @@ export default async function Home() {
                   size: "lg",
                   variant: "outline",
                   className:
-                    "border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold transition-all",
+                    "border-white text-blue-600 hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold transition-all",
                 })}
               >
                 View pricing
