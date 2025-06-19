@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import MaxWidthWrapper from "./max-width-wrapper";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
-import { ArrowRight, LogOut, User, HelpCircle } from "lucide-react";
+import { ArrowRight, LogOut, User, HelpCircle, Info } from "lucide-react";
 import { getCurrentUserAction } from "@/lib/session-actions";
 import {
   DropdownMenu,
@@ -109,6 +109,19 @@ function Navbar() {
                     Dashboard
                   </Link>
 
+                  <Link
+                    className={buttonVariants({ size: "sm", variant: "ghost" })}
+                    href="/help-center"
+                  >
+                    Help Center
+                  </Link>
+                  <Link
+                    className={buttonVariants({ size: "sm", variant: "ghost" })}
+                    href="/about"
+                  >
+                    About
+                  </Link>
+
                   <ThemeToggle />
 
                   <DropdownMenu>
@@ -148,9 +161,9 @@ function Navbar() {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/help-center" className="cursor-pointer">
-                          <HelpCircle className="mr-2 h-4 w-4" />
-                          Help Center
+                        <Link href="/about" className="cursor-pointer">
+                          <Info className="mr-2 h-4 w-4" />
+                          About
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -167,6 +180,12 @@ function Navbar() {
               ) : (
                 // Unauthenticated user menu
                 <>
+                  <Link
+                    className={buttonVariants({ size: "sm", variant: "ghost" })}
+                    href="/about"
+                  >
+                    About
+                  </Link>
                   <Link
                     className={buttonVariants({ size: "sm", variant: "ghost" })}
                     href="/pricing"
