@@ -12,7 +12,7 @@ import {
   Shield,
   MessageSquare,
 } from "lucide-react";
-import Image from "next/image";
+
 import Link from "next/link";
 
 export default function AboutPage() {
@@ -50,7 +50,7 @@ export default function AboutPage() {
           <CardContent>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
               To democratize access to information by making document analysis
-              as simple as having a conversation. We're building AI tools that
+              as simple as having a conversation. We&apos;re building AI tools that
               understand context, extract insights, and help people make better
               decisions faster.
             </p>
@@ -81,7 +81,7 @@ export default function AboutPage() {
             What Makes Fable Different
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            We've reimagined how people interact with documents, making AI
+            We&apos;ve reimagined how people interact with documents, making AI
             accessible and intuitive for everyone.
           </p>
         </div>
@@ -135,7 +135,7 @@ export default function AboutPage() {
             Meet the Team
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            We're a passionate team of engineers, designers, and researchers
+            We&apos;re a passionate team of engineers, designers, and researchers
             united by our mission to make AI accessible.
           </p>
         </div>
@@ -148,7 +148,7 @@ export default function AboutPage() {
               bio: "Senior AI Software Engineer with 10+ years in machine learning and document processing.",
               image: "/team/alex.jpg",
             },
-           
+
             {
               name: "Marcus Rodriguez",
               role: "Head of Product",
@@ -201,7 +201,7 @@ export default function AboutPage() {
               ),
               title: "User-Centric",
               description:
-                "Every feature we build starts with understanding our users' needs.",
+                "Every feature we build starts with understanding our users&apos; needs.",
             },
             {
               icon: (
@@ -300,7 +300,7 @@ export default function AboutPage() {
           Join Our Journey
         </h2>
         <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
-          We're always looking for talented people who share our passion for
+          We&apos;re always looking for talented people who share our passion for
           making AI accessible and useful for everyone.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
